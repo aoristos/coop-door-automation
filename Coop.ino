@@ -32,47 +32,69 @@ const byte EN1 = 6; // PWM
 const byte IN1 = 7; // MOTOR1 UP
 const byte IN2 = 8; // MOTOR1 DOWN
 
+// clock
+bool nightTime = false;
+
+//switches
+const byte upperSwitch = 11; // upperSwitch is HIGH when the door is fully open
+const byte lowerSwitch = 12; // lowerSwitch is HIGH when the door is fully closed
+byte upperSwitchState = 0; 
+byte lowerSwitchState = 0;
+
 // Security
 int Runtime = 3000; // Security Runtime Limit
 
 void setup()
 {
-  //initialize serial monitor
-  Serial.begin(9600); 
-  // initialize pinmide
+
+  // initialize serial communication at 9600 bits per second:
+  Serial.begin(9600);
+  
+  // initialize pinmodes
   pinMode(EN1, OUTPUT);
   pinMode(IN1, OUTPUT);
   pinMode(IN2, OUTPUT);
+  pinMode(upperSwitch, INPUT);
+  pinMode(lowerSwitch, INPUT);
 }
 
 void loop()
-{
+{ 
+  upperSwitchState = digitalRead(upperSwitch);
+  Serial.println(upperSwitchState);
   
-  // call function motorUp()
-  motor1Up(Runtime);
-  delay (Runtime);
+  if (nightTime == false && upperSwitchState == HIGH) {
+    // call function motor1Up()
+    Serial.print("in the loop :");
+    Serial.println(upperSwitchState);
+    motor1Up();   
+  }
+  else {
+    motor1Stop();
+  }
 
-  motor1Down(Runtime);
-  delay (Runtime);
 }
 
 
 // void functions do not return values
 // this function activates motor1Up
-void motor1Up(int Runtime)
-{  
-    digitalWrite(IN1,HIGH);
-    digitalWrite(IN2, LOW);
-    delay (Runtime);
-    digitalWrite(IN1, LOW);    
+void motor1Up() {  
+  digitalWrite(IN1,HIGH);
+  digitalWrite(IN2, LOW); 
 }
 
 // void functions do not return values
 // this function activates motor1Down
-void motor1Down(int Runtime)
-{  
-    digitalWrite(IN1,LOW);
-    digitalWrite(IN2, HIGH);
-    delay (Runtime);
-    digitalWrite(IN2, LOW);    
+void motor1Down(int Runtime) {  
+  digitalWrite(IN1,LOW);
+  digitalWrite(IN2, HIGH);
+  delay (Runtime);
+  digitalWrite(IN2, LOW);    
+}
+
+// void functions do not return values
+// this function stops the motor
+void motor1Stop() {
+ digitalWrite(IN1, LOW);
+ digitalWrite(IN2, LOW);  
 }
