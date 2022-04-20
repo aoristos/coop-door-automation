@@ -48,8 +48,8 @@ bool Alarm = false;
 
 // Security
 // limit the runtime to protect damage when a switch is never activated
-// runtime limit depends on the motorspeed and the diameter of the spool
-int Runtime = 5000; // Security Runtime Limit
+// runtimeLimit depends on the motorspeed and the diameter of the spool
+int RuntimeLimit = 5000; // Security runtime limit
 
 void setup()
 {
@@ -88,15 +88,6 @@ void loop()
 void motor1Up() {  
   digitalWrite(IN1,HIGH);
   digitalWrite(IN2, LOW); 
-}
-
-// void functions do not return values
-// this function activates motor1Down
-void motor1Down(int Runtime) {  
-  digitalWrite(IN1,LOW);
-  digitalWrite(IN2, HIGH);
-  delay (Runtime);
-  digitalWrite(IN2, LOW);    
 }
 
 // void functions do not return values
