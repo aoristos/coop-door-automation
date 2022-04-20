@@ -27,22 +27,27 @@
 // * https://github.com/PaulStoffregen/DS1307RTC/releases
 #include <DS1307RTC.h>
 
-// motor 1
+// Arduino pins for motor 1 
 const byte EN1 = 6; // PWM
 const byte IN1 = 7; // MOTOR1 UP
 const byte IN2 = 8; // MOTOR1 DOWN
 
 // clock
+// set flag 'true' for daytime
 bool nightTime = false;
 
-//switches
+//Arduino pins for the switches
 const byte upperSwitch = 11; // upperSwitch is HIGH when the door is fully open
 const byte lowerSwitch = 12; // lowerSwitch is HIGH when the door is fully closed
+
+// flag to indicate the state of the switches
 byte upperSwitchState = 0; 
 byte lowerSwitchState = 0;
 
 // Security
-int Runtime = 3000; // Security Runtime Limit
+// limit the runtime to protect damage when a switch is never activated
+// runtime limit depends on the motorspeed and the diameter of the spool
+int Runtime = 5000; // Security Runtime Limit
 
 void setup()
 {
@@ -61,15 +66,16 @@ void setup()
 void loop()
 { 
   upperSwitchState = digitalRead(upperSwitch);
-  Serial.println(upperSwitchState);
   
   if (nightTime == false && upperSwitchState == HIGH) {
     // call function motor1Up()
-    Serial.print("in the loop :");
+    Serial.print("motor1Up running :");
     Serial.println(upperSwitchState);
     motor1Up();   
   }
   else {
+    Serial.print("motor1Up stopped :");
+    Serial.println(upperSwitchState);
     motor1Stop();
   }
 
