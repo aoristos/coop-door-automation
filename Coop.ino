@@ -18,13 +18,13 @@
  * 
  */
  
-// * built-in library <wire.h> serves the communication with the I2C bus
+// built-in library <wire.h> serves the communication with the I2C bus
 #include <Wire.h>
 
-// * https://github.com/PaulStoffregen/Time/releases
+// https://github.com/PaulStoffregen/Time/releases
 #include <TimeLib.h>
 
-// * https://github.com/PaulStoffregen/DS1307RTC/releases
+// https://github.com/PaulStoffregen/DS1307RTC/releases
 #include <DS1307RTC.h>
 
 // Arduino pins for motor 1 
