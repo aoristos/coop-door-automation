@@ -32,17 +32,19 @@ const byte EN1 = 6; // PWM
 const byte IN1 = 7; // MOTOR1 UP
 const byte IN2 = 8; // MOTOR1 DOWN
 
-// clock
-// set flag 'true' for daytime
-bool nightTime = false;
-
 //Arduino pins for the switches
 const byte upperSwitch = 11; // upperSwitch is HIGH when the door is fully open
 const byte lowerSwitch = 12; // lowerSwitch is HIGH when the door is fully closed
 
+// Flags
+// set nighTime = false if it is daytime
+bool nightTime = false;
 // flag to indicate the state of the switches
-byte upperSwitchState = 0; 
-byte lowerSwitchState = 0;
+// switches are 'LOW' when activated
+byte upperSwitchState = LOW; 
+byte lowerSwitchState = LOW;
+// set flag Alarm = true if runtimeLimit is exceeded and no switch is activated
+bool Alarm = false;
 
 // Security
 // limit the runtime to protect damage when a switch is never activated
@@ -59,14 +61,15 @@ void setup()
   pinMode(EN1, OUTPUT);
   pinMode(IN1, OUTPUT);
   pinMode(IN2, OUTPUT);
-  pinMode(upperSwitch, INPUT);
-  pinMode(lowerSwitch, INPUT);
+  pinMode(upperSwitch, INPUT_PULLUP);
+  pinMode(lowerSwitch, INPUT_PULLUP);
 }
 
 void loop()
 { 
   upperSwitchState = digitalRead(upperSwitch);
-  
+
+  // if it is daytime AND the upperSwitch is not activated
   if (nightTime == false && upperSwitchState == HIGH) {
     // call function motor1Up()
     Serial.print("motor1Up running :");
@@ -78,9 +81,7 @@ void loop()
     Serial.println(upperSwitchState);
     motor1Stop();
   }
-
 }
-
 
 // void functions do not return values
 // this function activates motor1Up
