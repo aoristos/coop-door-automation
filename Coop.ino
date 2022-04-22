@@ -17,7 +17,8 @@
  *  <DS1307RTC.h> library ( https://github.com/PaulStoffregen/DS1307RTC/releases )
  * 
  */
- 
+
+ // include libraries
 // built-in library <wire.h> serves the communication with the I2C bus
 #include <Wire.h>
 
@@ -28,28 +29,33 @@
 #include <DS1307RTC.h>
 
 // Arduino pins for motor 1 
-const byte EN1 = 6; // PWM
-const byte IN1 = 7; // MOTOR1 UP
-const byte IN2 = 8; // MOTOR1 DOWN
+  const byte EN1 = 6; // PWM
+  const byte IN1 = 7; // MOTOR1 UP
+  const byte IN2 = 8; // MOTOR1 DOWN
 
 //Arduino pins for the switches
-const byte upperSwitch = 11; // upperSwitch is HIGH when the door is fully open
-const byte lowerSwitch = 12; // lowerSwitch is HIGH when the door is fully closed
+// Normal-Closed switches are 'LOW' (= Open) when activated
+  const byte upperSwitch = 11; // upperSwitch is LOW when the door is fully open
+  const byte lowerSwitch = 12; // lowerSwitch is LOW when the door is fully closed
 
-// Flags
-// set nighTime = false if it is daytime
-bool nightTime = false;
+// Variables
+// flag to indicate daytime or nighttime: set nighTime = false if it is daytime
+  bool nightTime = false;
+  
+// store the 'minutes after midnight' in the variable timeNow
+  int timeNow = 0;
+  
 // flag to indicate the state of the switches
-// switches are 'LOW' when activated
-byte upperSwitchState = LOW; 
-byte lowerSwitchState = LOW;
-// set flag Alarm = true if runtimeLimit is exceeded and no switch is activated
-bool Alarm = false;
+  byte upperSwitchState = LOW; 
+  byte lowerSwitchState = LOW;
+  
+// set flag Alarm = true if runtimeLimit is exceeded and no switch is activated (both switches are HIGH)
+  bool Alarm = false;
 
 // Security
 // limit the runtime to protect damage when a switch is never activated
 // runtimeLimit depends on the motorspeed and the diameter of the spool
-int RuntimeLimit = 5000; // Security runtime limit
+  int RuntimeLimit = 5000; // Security runtime limit
 
 void setup()
 {
@@ -63,6 +69,25 @@ void setup()
   pinMode(IN2, OUTPUT);
   pinMode(upperSwitch, INPUT_PULLUP);
   pinMode(lowerSwitch, INPUT_PULLUP);
+
+
+  // Based on NOAA_Solar_Calculations_year ( https://gml.noaa.gov/grad/solcalc/calcdetails.html )
+  // Calculations for Belgium-Bellegem latitude 50,50° / longitude 3,16°  Timezone GMT +1 
+  // Day 8 of every month is roughly medium between the season pivots at day 21  
+  // make sure you leave enough time for the chickens to go to bed !
+
+  int sun_rise[12]={
+ //Jan   Feb   Mar   Apr   May   Jun   Jul   Aug   Sep   Oct   Nov   Dec
+   526, 491, 436, 368, 310, 277, 286, 325, 372, 419, 470, 515};
+ // 08:46, 08:11, 07:16, 06:08, 05:09, 04:36, 04:45, 05:25, 06:12, 06:58, 07:50, 08:34     - Times are GMT+1 no summer saving as clock isn't adjusted
+
+  
+  int sun_set[12] ={
+ //Jan   Feb   Mar   Apr   May   Jun   Jul   Aug   Sep   Oct   Nov   Dec
+  1022, 1072, 1120, 1170, 1218, 1256, 1259, 1221, 1158, 1091, 1032, 1004};
+ // 17:01, 17:51, 18:40, 19:30, 20:17, 20:56, 20:59, 20:20, 19:17, 18:11, 17:11, 16:43      - Times are GMT+1 no summer saving as clock isn't adjusted
+
+  
 }
 
 void loop()
@@ -70,6 +95,7 @@ void loop()
     tmElements_t tm;
 
   if (RTC.read(tm)) {
+    
     Serial.print("Ok, Time = ");
     print2digits(tm.Hour);
     Serial.write(':');
@@ -103,17 +129,31 @@ void loop()
   // if it is daytime AND the upperSwitch is not activated
   if (nightTime == false && upperSwitchState == HIGH) {
     motor1Up();     // call function motor1Up()
-    Serial.print("motor1Up running :");
-    Serial.println(upperSwitchState); 
+    //TEST Serial.print("motor1Up running :");
+    // TEST Serial.println(upperSwitchState); 
   }
   else {
     motor1Stop(); // stop the motor
-    Serial.print("motor1Up stopped :");
-    Serial.println(upperSwitchState);
+    // TEST Serial.print("motor1Up stopped :");
+    // TEST Serial.println(upperSwitchState);
   }
 
   delay(10000);
+
+
+
+
+
+
+
+
+
 }
+
+
+
+
+
 
 // void functions do not return values
 // this function activates motor1Up
