@@ -39,12 +39,32 @@
   const byte lowerSwitch = 12; // lowerSwitch is LOW when the door is fully closed
 
 // Variables
+
+  // Values based on NOAA_Solar_Calculations_year ( https://gml.noaa.gov/grad/solcalc/calcdetails.html )
+  // Calculations for Belgium-Bellegem latitude 50,50° / longitude 3,16°  Timezone GMT +1 
+  // Values for day 8 of every month (is roughly medium between the season pivots at day 21)  
+  // make sure you leave enough time for the chickens to go to bed !
+
+  int sun_rise[12]={
+ //Jan   Feb   Mar   Apr   May   Jun   Jul   Aug   Sep   Oct   Nov   Dec
+   526, 491, 436, 368, 310, 277, 286, 325, 372, 419, 470, 515};
+ // 08:46, 08:11, 07:16, 06:08, 05:09, 04:36, 04:45, 05:25, 06:12, 06:58, 07:50, 08:34     - Times are GMT+1 no summer saving as clock isn't adjusted
+
+  int sun_set[12] ={
+ //Jan   Feb   Mar   Apr   May   Jun   Jul   Aug   Sep   Oct   Nov   Dec
+  1022, 1072, 1120, 1170, 1218, 1256, 1259, 1221, 1158, 1091, 1032, 1004};
+ // 17:01, 17:51, 18:40, 19:30, 20:17, 20:56, 20:59, 20:20, 19:17, 18:11, 17:11, 16:43      - Times are GMT+1 no summer saving as clock isn't adjusted
+
+
+// store the sunrise and sunset 'minutes after midnight'
+  int sunRiseNow = 0;
+  int sunSetNow = 0;
+// store the clocktime (value in minutes)
+  int clockTimeNow = 0;
+
 // flag to indicate daytime or nighttime: set nighTime = false if it is daytime
   bool nightTime = false;
-  
-// store the 'minutes after midnight' in the variable timeNow
-  int timeNow = 0;
-  
+   
 // flag to indicate the state of the switches
   byte upperSwitchState = LOW; 
   byte lowerSwitchState = LOW;
@@ -69,24 +89,6 @@ void setup()
   pinMode(IN2, OUTPUT);
   pinMode(upperSwitch, INPUT_PULLUP);
   pinMode(lowerSwitch, INPUT_PULLUP);
-
-
-  // Based on NOAA_Solar_Calculations_year ( https://gml.noaa.gov/grad/solcalc/calcdetails.html )
-  // Calculations for Belgium-Bellegem latitude 50,50° / longitude 3,16°  Timezone GMT +1 
-  // Day 8 of every month is roughly medium between the season pivots at day 21  
-  // make sure you leave enough time for the chickens to go to bed !
-
-  int sun_rise[12]={
- //Jan   Feb   Mar   Apr   May   Jun   Jul   Aug   Sep   Oct   Nov   Dec
-   526, 491, 436, 368, 310, 277, 286, 325, 372, 419, 470, 515};
- // 08:46, 08:11, 07:16, 06:08, 05:09, 04:36, 04:45, 05:25, 06:12, 06:58, 07:50, 08:34     - Times are GMT+1 no summer saving as clock isn't adjusted
-
-  
-  int sun_set[12] ={
- //Jan   Feb   Mar   Apr   May   Jun   Jul   Aug   Sep   Oct   Nov   Dec
-  1022, 1072, 1120, 1170, 1218, 1256, 1259, 1221, 1158, 1091, 1032, 1004};
- // 17:01, 17:51, 18:40, 19:30, 20:17, 20:56, 20:59, 20:20, 19:17, 18:11, 17:11, 16:43      - Times are GMT+1 no summer saving as clock isn't adjusted
-
   
 }
 
@@ -109,6 +111,11 @@ void loop()
     Serial.write('/');
     Serial.print(tmYearToCalendar(tm.Year));
     Serial.println();
+
+    nightTime = checkNightTime(tm);
+    Serial.print("the value of nightTime is now ");
+    Serial.println(nightTime);
+    
   } else {
     if (RTC.chipPresent()) {
       Serial.println("The DS1307 is stopped.  Please run the SetTime");
@@ -119,8 +126,9 @@ void loop()
       Serial.println();
     }
     delay(9000);
+    // GOT ALARM
   }
-  
+
 
 
   
@@ -141,17 +149,33 @@ void loop()
   delay(10000);
 
 
-
-
-
-
-
-
-
 }
 
 
+bool checkNightTime(tmElements_t tm){
+  
+  sunRiseNow = sun_rise[(tm.Month -1)];
+  // offset shift the sunset to 60 minutes later than the value in the array sun_set[] 
+  sunSetNow = sun_set [(tm.Month -1)] + 60; 
+  clockTimeNow = tm.Hour * 60 + tm.Minute;
 
+  Serial.print("sunRiseNow is ");  
+  Serial.print(sunRiseNow);
+  Serial.print("       sunSetNow is ");   
+  Serial.print(sunSetNow);
+    Serial.print("       clockTimeNow is ");  
+  Serial.println(clockTimeNow);
+
+  bool nightTime = true; // it is nighttime
+  if ((clockTimeNow >= sunRiseNow) && (clockTimeNow <= sunSetNow)){
+    nightTime = false; // it is daytime if the clocktime is between sunrise and sunset
+  }
+/*
+  Serial.print("the value of nightTime is now ");
+  Serial.println(nightTime);
+*/
+  return nightTime;
+}
 
 
 
