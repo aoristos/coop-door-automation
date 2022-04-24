@@ -97,7 +97,8 @@ void loop()
     tmElements_t tm;
 
   if (RTC.read(tm)) {
-    
+/* 
+ *  // test print
     Serial.print("Ok, Time = ");
     print2digits(tm.Hour);
     Serial.write(':');
@@ -111,66 +112,87 @@ void loop()
     Serial.write('/');
     Serial.print(tmYearToCalendar(tm.Year));
     Serial.println();
-
-    nightTime = checkNightTime(tm);
-    Serial.print("the value of nightTime is now ");
-    Serial.println(nightTime);
+*/
+	
+    nightTime = checkNightTime(tm); // check if nighttime OR daytime
+    /* 
+	Serial.print("the value of nightTime is now ");
+	Serial.println(nightTime);
+	*/
     
   } else {
     if (RTC.chipPresent()) {
       Serial.println("The DS1307 is stopped.  Please run the SetTime");
       Serial.println("example to initialize the time and begin running.");
       Serial.println();
+	  // GOTO ALARM
     } else {
       Serial.println("DS1307 read error!  Please check the circuitry.");
       Serial.println();
     }
     delay(9000);
-    // GOT ALARM
+	  // GOTO ALARM	
   }
-
-
-
   
   upperSwitchState = digitalRead(upperSwitch);
 
   // if it is daytime AND the upperSwitch is not activated
   if (nightTime == false && upperSwitchState == HIGH) {
-    motor1Up();     // call function motor1Up()
-    //TEST Serial.print("motor1Up running :");
+    runMotor1Up();     // call function runMotor1Up()
+	// test print
+    // TEST Serial.print("runMotor1Up running :");
     // TEST Serial.println(upperSwitchState); 
   }
   else {
-    motor1Stop(); // stop the motor
-    // TEST Serial.print("motor1Up stopped :");
+    runMotor1Stop(); // stop the motor
+	// test print
+    // TEST Serial.print("runMotor1Up stopped :");
     // TEST Serial.println(upperSwitchState);
   }
 
+  // if it is nighttime AND the lowerSwitch is not activated
+  if (nightTime == true && lowerSwitchState == HIGH) {
+    runMotor1Down();     // call function runMotor1Up()
+	// test print
+    // TEST Serial.print("runMotor1Down running :");
+    // TEST Serial.println(lowerSwitchState); 
+  }
+  else {
+    runMotor1Stop(); // stop the motor
+	// test print
+    // TEST Serial.print("runMotor1Up stopped :");
+    // TEST Serial.println(upperSwitchState);
+  }
+
+
   delay(10000);
 
+  runMotor1Stop()// test
+  
+  delay(10000);
 
 }
 
 
 bool checkNightTime(tmElements_t tm){
-  
   sunRiseNow = sun_rise[(tm.Month -1)];
   // offset shift the sunset to 60 minutes later than the value in the array sun_set[] 
   sunSetNow = sun_set [(tm.Month -1)] + 60; 
   clockTimeNow = tm.Hour * 60 + tm.Minute;
-
-  Serial.print("sunRiseNow is ");  
-  Serial.print(sunRiseNow);
-  Serial.print("       sunSetNow is ");   
-  Serial.print(sunSetNow);
+  // test print
+    Serial.print("sunRiseNow is ");  
+    Serial.print(sunRiseNow);
+    Serial.print("       sunSetNow is ");   
+    Serial.print(sunSetNow);
     Serial.print("       clockTimeNow is ");  
-  Serial.println(clockTimeNow);
-
+    Serial.println(clockTimeNow);
+  
   bool nightTime = true; // it is nighttime
   if ((clockTimeNow >= sunRiseNow) && (clockTimeNow <= sunSetNow)){
     nightTime = false; // it is daytime if the clocktime is between sunrise and sunset
   }
 /*
+ * // test print
   Serial.print("the value of nightTime is now ");
   Serial.println(nightTime);
 */
@@ -178,21 +200,32 @@ bool checkNightTime(tmElements_t tm){
 }
 
 
-
 // void functions do not return values
-// this function activates motor1Up
-void motor1Up() {  
+// this function activates runMotor1Up
+void runMotor1Up() {  
   digitalWrite(IN1,HIGH);
-  digitalWrite(IN2, LOW); 
+  digitalWrite(IN2, LOW);
+  Serial.println("Run Motor Up"); 
 }
 
-// void functions do not return values
-// this function stops the motor
-void motor1Stop() {
+
+// this function activates runMotor1Up
+void runMotor1Down() {  
+  digitalWrite(IN1,LOW);
+  digitalWrite(IN2, HIGH);
+  Serial.println("Run Motor Down"); 
+}
+
+
+// this function stops motor1
+void runMotor1Stop() {
  digitalWrite(IN1, LOW);
- digitalWrite(IN2, LOW);  
+ digitalWrite(IN2, LOW);
+ Serial.println("Run Motor Stop");   
 }
 
+
+/*
 // print number as 2-digits in case number is only 1-digit 
 void print2digits(int number) {
   if (number >= 0 && number < 10) {
@@ -200,3 +233,4 @@ void print2digits(int number) {
   }
   Serial.print(number);
 }
+*/
