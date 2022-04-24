@@ -3,8 +3,8 @@
  * 
  * documentation:
  *  "D:\Documents\Mijn PaperPort-documenten\Elektronica\Arduino\Shields\MotorShield-L298N-handleiding.pdf"
- *  Using a Real Time Clock with Arduino ( https://dronebotworkshop.com/real-time-clock-arduino/ )
- *  Controlling DC Motors with the L298N H Bridge and Arduino ( https://dronebotworkshop.com/dc-motors-l298n-h-bridge/ )
+ *  "Using a Real Time Clock with Arduino" ( https://dronebotworkshop.com/real-time-clock-arduino/ )
+ *  "Controlling DC Motors with the L298N H Bridge and Arduino" ( https://dronebotworkshop.com/dc-motors-l298n-h-bridge/ )
  *  
  * Hardware:
  *  Arduino Uno
@@ -27,6 +27,15 @@
 
 // https://github.com/PaulStoffregen/DS1307RTC/releases
 #include <DS1307RTC.h>
+
+// TODO the switch status depends on the switch type (NormalOpen or NormalClose)
+#define SWITCH_ACTIVE LOW
+#define SWITCH_NON_ACTIVE HIGH
+ 
+// flag to indicate the state of the switches
+  byte upperSwitchState = SWITCH_NON_ACTIVE; 
+  byte lowerSwitchState = SWITCH_NON_ACTIVE;
+  
 
 // Arduino pins for motor 1 
   const byte EN1 = 6; // PWM
@@ -64,11 +73,7 @@
 
 // flag to indicate daytime or nighttime: set nighTime = false if it is daytime
   bool nightTime = false;
-   
-// flag to indicate the state of the switches
-  byte upperSwitchState = LOW; 
-  byte lowerSwitchState = LOW;
-  
+
 // set flag Alarm = true if runtimeLimit is exceeded and no switch is activated (both switches are HIGH)
   bool Alarm = false;
 
@@ -115,10 +120,10 @@ void loop()
 */
 	
     nightTime = checkNightTime(tm); // check if nighttime OR daytime
-    /* 
+   
 	Serial.print("the value of nightTime is now ");
 	Serial.println(nightTime);
-	*/
+	
     
   } else {
     if (RTC.chipPresent()) {
@@ -135,9 +140,10 @@ void loop()
   }
   
   upperSwitchState = digitalRead(upperSwitch);
+  lowerSwitchState = digitalRead(lowerSwitch);
 
-  // if it is daytime AND the upperSwitch is not activated
-  if (nightTime == false && upperSwitchState == HIGH) {
+  // if it is daytime AND the upperSwitch is SWITCH_NON_ACTIVE
+  if (nightTime == false && upperSwitchState == SWITCH_NON_ACTIVE) {
     runMotor1Up();     // call function runMotor1Up()
 	// test print
     // TEST Serial.print("runMotor1Up running :");
@@ -150,8 +156,8 @@ void loop()
     // TEST Serial.println(upperSwitchState);
   }
 
-  // if it is nighttime AND the lowerSwitch is not activated
-  if (nightTime == true && lowerSwitchState == HIGH) {
+  // if it is nighttime AND the lowerSwitch is SWITCH_NON_ACTIVE
+  if (nightTime == true && lowerSwitchState == SWITCH_NON_ACTIVE) {
     runMotor1Down();     // call function runMotor1Up()
 	// test print
     // TEST Serial.print("runMotor1Down running :");
@@ -164,21 +170,35 @@ void loop()
     // TEST Serial.println(upperSwitchState);
   }
 
+  // if it is daytime AND the upperSwitch is not activated
+  if (nightTime == false && upperSwitchState == SWITCH_NON_ACTIVE) {
+    runMotor1Up();     // call function runMotor1Up()
+  // test print
+    // TEST Serial.print("runMotor1Down running :");
+    // TEST Serial.println(lowerSwitchState); 
+  }
+  else {
+    runMotor1Stop(); // stop the motor
+  // test print
+    // TEST Serial.print("runMotor1Up stopped :");
+    // TEST Serial.println(upperSwitchState);
+  }
 
-  delay(10000);
 
-  runMotor1Stop()// test
-  
-  delay(10000);
+
+  // delay(10000);
+
 
 }
 
 
 bool checkNightTime(tmElements_t tm){
+  // ! (tm.Month-1) because the array positions count from [0] to [11]
   sunRiseNow = sun_rise[(tm.Month -1)];
-  // offset shift the sunset to 60 minutes later than the value in the array sun_set[] 
-  sunSetNow = sun_set [(tm.Month -1)] + 60; 
-  clockTimeNow = tm.Hour * 60 + tm.Minute;
+  // offset shift the sunset to 60 minutes later than the value in the array sun_set[]
+  sunSetNow = sun_set [(tm.Month -1)] + 60;
+  // (tm.Hour-1) set the clockTimeNow in wintertime
+  clockTimeNow = (tm.Hour-1) * 60 + tm.Minute;
   // test print
     Serial.print("sunRiseNow is ");  
     Serial.print(sunRiseNow);
@@ -206,6 +226,8 @@ void runMotor1Up() {
   digitalWrite(IN1,HIGH);
   digitalWrite(IN2, LOW);
   Serial.println("Run Motor Up"); 
+  // test delay
+  delay(10000);
 }
 
 
@@ -214,6 +236,8 @@ void runMotor1Down() {
   digitalWrite(IN1,LOW);
   digitalWrite(IN2, HIGH);
   Serial.println("Run Motor Down"); 
+  // test delay
+  delay(10000);
 }
 
 
