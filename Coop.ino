@@ -18,43 +18,52 @@
  * 
  */
 
+// TODO: set appropriate offset parameters:
+  // TODO: subtract 1 hour (tm.Hour - summerTimeOffset) when the DS1307RTC is running in summertime modus (daylight saving time values)(zomertijd)
+    byte summerTimeOffset = 1;
+
+  //make sure you leave enough time for the chickens to go to bed
+  // TODO: increase sunSetNow with a safety offset time (e.g. 30 or 60 minutes)
+    byte sunSetOffset = 60;
+  // TODO: increase sunRiseNow with a safety offset time (e.g. 30 or 60 minutes)
+    byte sunRiseOffset = 30;
+
+  // TODO: the HIGH or LOW status depends on the switch type (NORMAL_OPEN or NORMAL_CLOSE), the wiring and the configuration of the switch INPUT PINS
+  // set the desired configuration here:
+    const bool SWITCH_IS_ACTIVATED = LOW;
+    // const bool SWITCH_IS_ACTIVATED = HIGH;
+    const bool SWITCH_NOT_ACTIVATED = HIGH;
+    // const bool SWITCH_NOT_ACTIVATED = LOW;
+
  // include libraries
 // built-in library <wire.h> serves the communication with the I2C bus
-#include <Wire.h>
+  #include <Wire.h>
 
 // TimeLib.h (author Paul Stoffregen)
 // https://github.com/PaulStoffregen/Time/releases
-#include <TimeLib.h>
+  #include <TimeLib.h>
 
 //DS1307RTC.h (author Paul Stoffregen)
 // https://github.com/PaulStoffregen/DS1307RTC/releases
-#include <DS1307RTC.h>
+  #include <DS1307RTC.h>
 
-// TODO the switch status depends on the switch type (NormalOpen or NormalClose)
-const bool SWITCH_IS_ACTIVATED = LOW;
-const bool SWITCH_NOT_ACTIVATED = HIGH;
- 
 // flag to indicate the state of the switches
   byte upperSwitchState = SWITCH_NOT_ACTIVATED; 
   byte lowerSwitchState = SWITCH_NOT_ACTIVATED;
   
-
 // Arduino pins for motor 1 
   const byte EN1 = 6; // PWM
   const byte IN1 = 7; // MOTOR1 UP
   const byte IN2 = 8; // MOTOR1 DOWN
 
 //Arduino pins for the switches
-// Normal-Closed switches are 'LOW' (= Open) when activated
-  const byte upperSwitch = 11; // upperSwitch is LOW when the door is fully open
-  const byte lowerSwitch = 12; // lowerSwitch is LOW when the door is fully closed
-
-// Variables
+  const byte upperSwitch = 11; // SWITCH_IS_ACTIVATED when the door is fully open
+  const byte lowerSwitch = 12; // SWITCH_IS_ACTIVATED when the door is fully closed
 
   // Values based on NOAA_Solar_Calculations_year ( https://gml.noaa.gov/grad/solcalc/calcdetails.html )
-  // Calculations for Belgium-Bellegem latitude 50,50° / longitude 3,16°  Timezone GMT +1 
+  // Calculations for Belgium-Bellegem latitude 50,50° / longitude 3,16°  Timezone GMT +1
+  // Times are GMT+1 ; no summertime (daylight saving time) 
   // Values for day 8 of every month (day 8 is roughly medium between the season pivots at day 21)  
-  // make sure you leave enough time for the chickens to go to bed !
 
   int sun_rise[12]={
  //Jan   Feb   Mar   Apr   May   Jun   Jul   Aug   Sep   Oct   Nov   Dec
@@ -73,14 +82,15 @@ const bool SWITCH_NOT_ACTIVATED = HIGH;
 // store the clocktime (value in minutes)
   int clockTimeNow = 0;
 
-// flag to indicate daytime or nighttime: set nighTime = false if it is daytime
+// flag to indicate daytime or nighttime
+  // 'nighTime = false' when it is day ; 'nighTime = true' when it is night
   bool nightTime = false;
 
 // Security
-// set flag Alarm = true if runtimeLimit is exceeded and no switch is activated (both switches are SWITCH_NOT_ACTIVATED)
+// set flag 'Alarm = true' if runtimeLimit is exceeded and no switch is activated (both switches are SWITCH_NOT_ACTIVATED)
   bool Alarm = false;
 // limit the runtime to protect damage when a switch is never activated
-// runtimeLimit depends on the motorspeed and the diameter of the spool
+// runtimeLimit depends on the motorspeed, the diameter of the spool and the door eleavtion height.
   int RuntimeLimit = 5000; // Security runtime limit
 
 void setup()
@@ -157,30 +167,28 @@ void loop()
     runMotor1Down();     // call function runMotor1Down()
 
 	  // // test print
-    // EST Serial.print("runMotor1Down running :");
-    // TEST Serial.println(lowerSwitchState); 
+    // Serial.print("runMotor1Down running :");
+    // Serial.println(lowerSwitchState); 
 
   }
   else {
     runMotor1Stop(); // stop the motor
 
 	   // // test print
-    // TEST Serial.print("runMotor1Up stopped :");
-    // TEST Serial.println(upperSwitchState);
-    // TEST Serial.print("runMotor1Down stopped :");
-    // TEST Serial.println(lowerSwitchState);
+    // Serial.print("runMotor1Up stopped :");
+    // Serial.println(upperSwitchState);
+    // Serial.print("runMotor1Down stopped :");
+    // Serial.println(lowerSwitchState);
   }
 }
 
 
 bool checkNightTime(tmElements_t tm){
-  // ! (tm.Month-1) because the first element of the array is at index 0 (the array positions count from [0] to [11])
-  sunRiseNow = sun_rise[(tm.Month -1)];
-  // offset shift the sunset to 60 minutes later than the value in the array sun_set[]
-  sunSetNow = sun_set [(tm.Month -1)] + 60;
-  // (tm.Hour-1) set the clockTimeNow in wintertime
-  clockTimeNow = (tm.Hour-1) * 60 + tm.Minute;
-
+  
+  sunRiseNow = sun_rise[(tm.Month -1)]; // ! (tm.Month-1) because the first element of the array is at index 0 (the array positions count from [0] to [11])
+  sunSetNow = sun_set [(tm.Month -1)] + sunSetOffset;  //   // Add a safety offset time to avoid "locked-out" chickens.
+  clockTimeNow = (tm.Hour-summerTimeOffset) * 60 + tm.Minute; // substract the summerTimeOffset (1 Hour) when the clock runs in summertime modus
+    
   // //test print
   // Serial.print("sunRiseNow is ");  
   // Serial.print(sunRiseNow);
@@ -220,13 +228,14 @@ void runMotor1Down() {
 
 // this function stops motor1
 void runMotor1Stop() {
- digitalWrite(IN1, LOW);
- digitalWrite(IN2, LOW);
+   digitalWrite(IN1, LOW);
+  digitalWrite(IN2, LOW);
  // test print
- Serial.println("Run Motor Stop");
- // wait 60 seconden before returning to the main loop
+  Serial.println("Run Motor Stop");
+ // TODO wait 60 seconden before returning to the main loop
  // delay(60000);
- delay(5000);  
+ // TEST delay(5000)
+  delay(5000);  
 }
 
 
