@@ -48,8 +48,8 @@
   #include <DS1307RTC.h>
 
 // flag to indicate the state of the switches
-  byte upperSwitchState = SWITCH_NOT_ACTIVATED; 
-  byte lowerSwitchState = SWITCH_NOT_ACTIVATED;
+  bool upperSwitchState = SWITCH_NOT_ACTIVATED;
+  bool lowerSwitchState = SWITCH_NOT_ACTIVATED;
   
 // Arduino pins for motor 1 
   const byte EN1 = 6; // PWM
@@ -148,8 +148,9 @@ void loop()
 	  // todo GOTO ALARM	
   }
 
- 
+  // read the state of the upperSwitch and place it in the variable upperStateSwitch
   upperSwitchState = digitalRead(upperSwitch);
+  // read the state of the lowerSwitch and place it in the variable lowerStateSwitch
   lowerSwitchState = digitalRead(lowerSwitch);
 
 
@@ -186,8 +187,8 @@ void loop()
 bool checkNightTime(tmElements_t tm){
   
   sunRiseNow = sun_rise[(tm.Month -1)]; // ! (tm.Month-1) because the first element of the array is at index 0 (the array positions count from [0] to [11])
-  sunSetNow = sun_set [(tm.Month -1)] + sunSetOffset;  //   // Add a safety offset time to avoid "locked-out" chickens.
-  clockTimeNow = (tm.Hour-summerTimeOffset) * 60 + tm.Minute; // substract the summerTimeOffset (1 Hour) when the clock runs in summertime modus
+  sunSetNow = sun_set [(tm.Month -1)] + sunSetOffset;  //   // Find the appropriate time in the array sun_set[] and add a safety offset time (e.g. 60 minutes) to avoid "locked-out" chickens.
+  clockTimeNow = (tm.Hour-summerTimeOffset) * 60 + tm.Minute; // clockTimeNow in minutes: substract 1 Hour (summerTimeOffset) when the clock runs in summertime 
     
   // //test print
   // Serial.print("sunRiseNow is ");  
