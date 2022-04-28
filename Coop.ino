@@ -1,8 +1,7 @@
  /*
- * Open and close a chicken cooop door, using an Arduino Uno, a MotorShield-L298N and a DS1307RTC
+ * Open and close a chicken cooop door, using an Arduino Uno, a MotorShield-L298N and a Real Time Clock DS1307RTC
  * 
  * documentation:
- *  "D:\Documents\Mijn PaperPort-documenten\Elektronica\Arduino\Shields\MotorShield-L298N-handleiding.pdf"
  *  "Using a Real Time Clock with Arduino" ( https://dronebotworkshop.com/real-time-clock-arduino/ )
  *  "Controlling DC Motors with the L298N H Bridge and Arduino" ( https://dronebotworkshop.com/dc-motors-l298n-h-bridge/ )
  *  
@@ -18,38 +17,41 @@
  * 
  */
 
-// TODO: set appropriate offset parameters:
-  // TODO: subtract 1 hour (tm.Hour - summerTimeOffset) when the DS1307RTC is running in summertime modus (daylight saving time values)(zomertijd)
-    byte summerTimeOffset = 1;
+// ATTENTION: adjust appropriate offset parameters in the code:
 
-  //make sure you leave enough time for the chickens to go to bed
-  // TODO: increase sunSetNow with a safety offset time (e.g. 30 or 60 minutes)
+  // ATTENTION: subtract 1 hour (tm.Hour - summerTimeOffset) when the DS1307RTC is running in summertime modus (daylight saving time values)(zomertijd)
+    byte summerTimeOffset = 1; // when the clock-time is equal with the summer-time
+    // byte summerTimeOffset = 0; // when the clock-time is equal with the winter-time
+
+  // ATTENTION: make sure you leave enough time for the chickens to go to bed
+  // increase sunSetNow with a safety offset time (e.g. 60 minutes)
     byte sunSetOffset = 60;
-  // TODO: increase sunRiseNow with a safety offset time (e.g. 30 or 60 minutes)
+  // ATTENTION: do not wake up the chickens too early
+  //increase sunRiseNow with a safety offset time (e.g. 30 minutes)
     byte sunRiseOffset = 30;
+  
+  // the HIGH or LOW status depends on the switch type (NORMAL_OPEN or NORMAL_CLOSE), the wiring and the configuration of the switch INPUT PINS
+  // ATTENTION: uncomment the desired values here:
+  
+    const bool SWITCH_IS_ACTIVATED = LOW; //= NormalClosed switch
+    // const bool SWITCH_IS_ACTIVATED = HIGH;  //= NormalOpen switch
 
-  // TODO: the HIGH or LOW status depends on the switch type (NORMAL_OPEN or NORMAL_CLOSE), the wiring and the configuration of the switch INPUT PINS
-  // set the desired configuration here:
-    const bool SWITCH_IS_ACTIVATED = LOW;
-    // const bool SWITCH_IS_ACTIVATED = HIGH;
-    const bool SWITCH_NOT_ACTIVATED = HIGH;
-    // const bool SWITCH_NOT_ACTIVATED = LOW;
+    const bool SWITCH_NOT_ACTIVATED = HIGH;  //= NormalClosed switch
+    // const bool SWITCH_NOT_ACTIVATED = LOW;  //= NormalOpen switch
+  
+// flags to indicate the state of the switches
+  bool upperSwitchState; // 'upperSwitchState = SWITCH_IS_ACTIVATED' when the door is fully open
+  bool lowerSwitchState; // 'lowerSwitchState = SWITCH_IS_ACTIVATED' when the door is fully closed
 
- // include libraries
-// built-in library <wire.h> serves the communication with the I2C bus
-  #include <Wire.h>
-
-// TimeLib.h (author Paul Stoffregen)
-// https://github.com/PaulStoffregen/Time/releases
-  #include <TimeLib.h>
-
-//DS1307RTC.h (author Paul Stoffregen)
-// https://github.com/PaulStoffregen/DS1307RTC/releases
-  #include <DS1307RTC.h>
-
-// flag to indicate the state of the switches
-  bool upperSwitchState = SWITCH_NOT_ACTIVATED;
-  bool lowerSwitchState = SWITCH_NOT_ACTIVATED;
+// include libraries
+  // built-in library <wire.h> serves the communication with the I2C bus
+    #include <Wire.h>
+  // TimeLib.h (author Paul Stoffregen)
+  // https://github.com/PaulStoffregen/Time/releases
+    #include <TimeLib.h>
+  //DS1307RTC.h (author Paul Stoffregen)
+  // https://github.com/PaulStoffregen/DS1307RTC/releases
+    #include <DS1307RTC.h>
   
 // Arduino pins for motor 1 
   const byte EN1 = 6; // PWM
@@ -57,34 +59,33 @@
   const byte IN2 = 8; // MOTOR1 DOWN
 
 //Arduino pins for the switches
-  const byte upperSwitch = 11; // SWITCH_IS_ACTIVATED when the door is fully open
-  const byte lowerSwitch = 12; // SWITCH_IS_ACTIVATED when the door is fully closed
+  const byte upperSwitch = 11;
+  const byte lowerSwitch = 12;
 
-// Values based on NOAA_Solar_Calculations_year ( https://gml.noaa.gov/grad/solcalc/calcdetails.html )
-// Calculations for Belgium-Bellegem latitude 50,50° / longitude 3,16°  Timezone GMT +1
-// Times are GMT+1 ; no summertime (daylight saving time) 
+// Arrays with the sunRise and sunSet epherides for each month
+// Calculations for Belgium-Bellegem latitude 50,50° / longitude 3,16°  Timezone GMT +1  (no daylight saving time)
 // Values for day 8 of every month (day 8 is roughly medium between the season pivots at day 21)
+// Jan   Feb   Mar   Apr   May   Jun   Jul   Aug   Sep   Oct   Nov   Dec
+// Values based on NOAA_Solar_Calculations_year ( https://gml.noaa.gov/grad/solcalc/calcdetails.html )
 
-  int sun_rise[12]={
-  //Jan   Feb   Mar   Apr   May   Jun   Jul   Aug   Sep   Oct   Nov   Dec
+  int sun_rise[12]={ 
   526, 491, 436, 368, 310, 277, 286, 325, 372, 419, 470, 515};
   // 08:46, 08:11, 07:16, 06:08, 05:09, 04:36, 04:45, 05:25, 06:12, 06:58, 07:50, 08:34     - Times are GMT+1 no summer saving as clock isn't adjusted
-
+  
   int sun_set[12] ={
   //Jan   Feb   Mar   Apr   May   Jun   Jul   Aug   Sep   Oct   Nov   Dec
   1022, 1072, 1120, 1170, 1218, 1256, 1259, 1221, 1158, 1091, 1032, 1004};
   // 17:01, 17:51, 18:40, 19:30, 20:17, 20:56, 20:59, 20:20, 19:17, 18:11, 17:11, 16:43      - Times are GMT+1 no summer saving as clock isn't adjusted
 
-
-// store the sunrise and sunset 'minutes after midnight'
-  int sunRiseNow = 0;
-  int sunSetNow = 0;
-// store the clocktime (value in minutes)
-  int clockTimeNow = 0;
+// store today's sunrise and sunset 'minutes after midnight'
+  int sunRiseNow;
+  int sunSetNow;
+// store the clocktime (value in minutes) after reading the DS1307RTC
+  int clockTimeNow;
 
 // flag to indicate daytime or nighttime
 // 'nighTime = false' when it is day ; 'nighTime = true' when it is night
-  bool nightTime = false;
+  bool nightTime;
 
 // Security
 // set flag 'Alarm = true' if runtimeLimit is exceeded and no switch is activated (both switches are SWITCH_NOT_ACTIVATED)
@@ -95,20 +96,21 @@
 
 void setup()
 {
-
  
-// test print
-  Serial.println("Dit is void setup()");
-  delay(3000);
-
+// // test print
+  // Serial.println("Dit is de functie void setup()");
+  // delay(3000);
   
   // initialize serial communication at 9600 bits per second:
   Serial.begin(9600);
   
   // initialize pinmodes
   pinMode(EN1, OUTPUT);
+  digitalWrite(EN1,LOW);
   pinMode(IN1, OUTPUT);
+  digitalWrite(IN1,LOW);
   pinMode(IN2, OUTPUT);
+  digitalWrite(IN2,LOW);
   pinMode(upperSwitch, INPUT_PULLUP);
   pinMode(lowerSwitch, INPUT_PULLUP);
 }
@@ -117,10 +119,9 @@ void setup()
 void loop()
 { 
 
-
-// test print
-  Serial.println("Dit is void loop()");
-  delay(3000);
+// // test print
+  // Serial.println("Dit is de functie void loop()");
+  // delay(3000);
 
   tmElements_t tm;
 
@@ -144,8 +145,8 @@ void loop()
 	
     nightTime = checkNightTime(tm); // check if it is nighttime OR daytime
     // // test print
-	   Serial.print("the value of nightTime is now ");
-	   Serial.println(nightTime);
+	  // Serial.print("the value of nightTime is now ");
+	  // Serial.println(nightTime);
     
   } else {
     if (RTC.chipPresent()) {
@@ -161,12 +162,12 @@ void loop()
 	  // todo GOTO ALARM	
   }
 
-  // read the state of the upperSwitch and place it in the variable upperStateSwitch
+  // read the state of the upperSwitch and place it in the variable upperSwitchState
     upperSwitchState = digitalRead(upperSwitch);
-  // read the state of the lowerSwitch and place it in the variable lowerStateSwitch
+  // read the state of the lowerSwitch and place it in the variable lowerSwitchState
     lowerSwitchState = digitalRead(lowerSwitch);
 
-  // if it is daytime AND the upperSwitchstate is SWITCH_NOT_ACTIVATED
+  // run Motor1Up if it is daytime AND the upperSwitchstate is SWITCH_NOT_ACTIVATED
   if (nightTime == false && upperSwitchState == SWITCH_NOT_ACTIVATED) {
     runMotor1Up();     // call function runMotor1Up()
 	
@@ -175,7 +176,7 @@ void loop()
     // TEST Serial.println(upperSwitchState); 
 
   }  
-  // else if it is nighttime AND the lowerSwitchstate is SWITCH_NOT_ACTIVATED
+  // else runMotor1Down if it is nighttime AND the lowerSwitchstate is SWITCH_NOT_ACTIVATED
   else if (nightTime == true && lowerSwitchState == SWITCH_NOT_ACTIVATED) {
     runMotor1Down();     // call function runMotor1Down()
 
@@ -184,6 +185,7 @@ void loop()
     // Serial.println(lowerSwitchState); 
 
   }
+  // else runMotor1Stop
   else {
     runMotor1Stop(); // stop the motor
 
@@ -196,26 +198,29 @@ void loop()
 
 }
 
-
+// function to check if it's day or night
+// this function uses the type 'tmElements_ts' object 'tm' from the 'DS1307RTC.h' library
 bool checkNightTime(tmElements_t tm){
 
-  // test print
-  Serial.println("Dit is CheckNighTime()");
-  delay(3000);
-  
-  sunRiseNow = sun_rise[(tm.Month -1)]; // ! (tm.Month-1) because the first element of the array is at index 0 (the array positions count from [0] to [11])
-  sunSetNow = sun_set [(tm.Month -1)] + sunSetOffset;  //   // Find the appropriate time in the array sun_set[] and add a safety offset time (e.g. 60 minutes) to avoid "locked-out" chickens.
+  // // test print
+  // Serial.println("Dit is CheckNighTime()");
+  // delay(3000);
+
+  // ! (tm.Month-1) because the first element of an array is at index 0 (the array positions count from [0] to [11])
+  sunRiseNow = sun_rise[(tm.Month -1)] + sunRiseOffset;  // Find the appropriate time in the array sun_rise[] and add a safety offset time (e.g. 30 minutes) to avoid a premature wake up.
+  sunSetNow = sun_set [(tm.Month -1)] + sunSetOffset;  // Find the appropriate time in the array sun_set[] and add a safety offset time (e.g. 60 minutes) to avoid "locked-out" chickens.
   clockTimeNow = (tm.Hour-summerTimeOffset) * 60 + tm.Minute; // clockTimeNow in minutes: substract 1 Hour (summerTimeOffset) when the clock runs in summertime 
     
   // //test print
+  /*
     Serial.print("sunRiseNow is ");  
     Serial.print(sunRiseNow);
     Serial.print("       sunSetNow is ");   
     Serial.print(sunSetNow);
     Serial.print("       clockTimeNow is ");  
     Serial.println(clockTimeNow);
-
-  bool nightTime = true; // it is nighttime
+  */
+  bool nightTime = true; // it is nighttime except if the clocktime is between sunrise and sunset
   if ((clockTimeNow >= sunRiseNow) && (clockTimeNow <= sunSetNow)){
     nightTime = false; // it is daytime if the clocktime is between sunrise and sunset
   }
@@ -231,9 +236,9 @@ bool checkNightTime(tmElements_t tm){
 // this function activates runMotor1Up
 void runMotor1Up() {  
 
-  // test print
-    Serial.println("Dit is void runMotor1Up()");
-    delay(3000);
+  // // test print
+    // Serial.println("Dit is de functie void runMotor1Up()");
+    // delay(3000);
   
   digitalWrite(IN1,HIGH);
   digitalWrite(IN2, LOW);
@@ -244,15 +249,12 @@ void runMotor1Up() {
 // this function activates runMotor1Down
 void runMotor1Down() { 
 
-
-// test print
-  Serial.println("Dit is void runMotor1Down()");
-  delay(3000);
-
+// //test print
+  // Serial.println("Dit is de functie void runMotor1Down()");
+  // delay(3000);
    
   digitalWrite(IN1,LOW);
   digitalWrite(IN2, HIGH);
-
   
 }
 
@@ -260,16 +262,15 @@ void runMotor1Down() {
 // this function stops motor1
 void runMotor1Stop() {
 
-
-// test print
-  Serial.println("Dit is void runMotor1Stop()");
-  delay(3000);
-
+// // test print
+  // Serial.println("Dit is de functie void runMotor1Stop()");
+  // delay(3000);
   
-   digitalWrite(IN1, LOW);
+  digitalWrite(IN1, LOW);
   digitalWrite(IN2, LOW);
 
 }
+
 
 void security (int runTimeLimit) {
   delay(runTimeLimit);
@@ -281,10 +282,11 @@ void security (int runTimeLimit) {
     Serial.println("Over tijd !");
   }
   
-  // test print
-  Serial.println("Dit is void security (int runTimeLimit)");
-  delay(3000);
+  // // test print
+  // Serial.println("Dit is de functie void security (int runTimeLimit)");
+  // delay(3000);
 }
+
 
 /*
 // print number as 2-digits in case number is only 1-digit 
