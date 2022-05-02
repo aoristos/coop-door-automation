@@ -33,11 +33,11 @@
   // the HIGH or LOW status depends on the switch type (NORMAL_OPEN or NORMAL_CLOSE), the wiring and the configuration of the switch INPUT PINS
   // ATTENTION: uncomment the desired values here:
   
-    const bool SWITCH_IS_ACTIVATED = LOW; //= NormalClosed switch
-    // const bool SWITCH_IS_ACTIVATED = HIGH;  //= NormalOpen switch
+    // const bool SWITCH_IS_ACTIVATED = LOW; //= NormalClosed switch
+    const bool SWITCH_IS_ACTIVATED = HIGH;  //= NormalOpen switch
 
-    const bool SWITCH_NOT_ACTIVATED = HIGH;  //= NormalClosed switch
-    // const bool SWITCH_NOT_ACTIVATED = LOW;  //= NormalOpen switch
+    // const bool SWITCH_NOT_ACTIVATED = HIGH;  //= NormalClosed switch
+    const bool SWITCH_NOT_ACTIVATED = LOW;  //= NormalOpen switch
   
 // flags to indicate the state of the switches
   bool upperSwitchState; // 'upperSwitchState = SWITCH_IS_ACTIVATED' when the door is fully open
@@ -54,15 +54,15 @@
     #include <DS1307RTC.h>
   
 // Arduino pins for motor 1 
-  const byte EN1 = 6; // PWM
-  const byte IN1 = 7; // MOTOR1 UP
-  const byte IN2 = 8; // MOTOR1 DOWN
+  // const byte EN1 = 6; // PWM
+  const byte IN1 = 8; // MOTOR1 UP
+  const byte IN2 = 9; // MOTOR1 DOWN
 
 //Arduino pins for the switches
-  const byte upperSwitch = 11;
-  const byte lowerSwitch = 12;
+  const byte upperSwitch = 7;
+  const byte lowerSwitch = 6;
 
-// Arrays with the sunRise and sunSet epherides for each month
+// Arrays with the sunRise and sunSet ephemerides for each month
 // Calculations for Belgium-Bellegem latitude 50,50° / longitude 3,16°  Timezone GMT +1  (no daylight saving time)
 // Values for day 8 of every month (day 8 is roughly medium between the season pivots at day 21)
 // Jan   Feb   Mar   Apr   May   Jun   Jul   Aug   Sep   Oct   Nov   Dec
