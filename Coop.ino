@@ -105,8 +105,8 @@ void setup()
   Serial.begin(9600);
   
   // initialize pinmodes
-  pinMode(EN1, OUTPUT);
-  digitalWrite(EN1,LOW);
+//  pinMode(EN1, OUTPUT);
+//  digitalWrite(EN1,LOW);
   pinMode(IN1, OUTPUT);
   digitalWrite(IN1,LOW);
   pinMode(IN2, OUTPUT);
@@ -271,21 +271,6 @@ void runMotor1Stop() {
 
 }
 
-
-void security (int runTimeLimit) {
-  delay(runTimeLimit);
-    // read the state of the upperSwitch and place it in the variable upperStateSwitch
-  upperSwitchState = digitalRead(upperSwitch);
-  // read the state of the lowerSwitch and place it in the variable lowerStateSwitch
-  lowerSwitchState = digitalRead(lowerSwitch);
-  if (upperSwitchState = SWITCH_NOT_ACTIVATED) {
-    Serial.println("Over tijd !");
-  }
-  
-  // // test print
-  // Serial.println("Dit is de functie void security (int runTimeLimit)");
-  // delay(3000);
-}
 
 
 /*
