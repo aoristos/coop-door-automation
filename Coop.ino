@@ -4,6 +4,7 @@
  * documentation:
  *  "Using a Real Time Clock with Arduino" ( https://dronebotworkshop.com/real-time-clock-arduino/ )
  *  "Controlling DC Motors with the L298N H Bridge and Arduino" ( https://dronebotworkshop.com/dc-motors-l298n-h-bridge/ )
+ *  "The L298N H-bridge motor controller module - basics" ( https://www.youtube.com/watch?v=-ikmDMW6tEw )
  *  
  * Hardware:
  *  Arduino Uno
@@ -33,10 +34,10 @@
   // the HIGH or LOW status depends on the switch type (NORMAL_OPEN or NORMAL_CLOSE), the wiring and the configuration of the switch INPUT PINS
   // ATTENTION: uncomment the desired values here:
   
-    // const bool SWITCH_IS_ACTIVATED = LOW; //= NormalClosed switch
+    //const bool SWITCH_IS_ACTIVATED = LOW; //= NormalClosed switch
     const bool SWITCH_IS_ACTIVATED = HIGH;  //= NormalOpen switch
 
-    // const bool SWITCH_NOT_ACTIVATED = HIGH;  //= NormalClosed switch
+    //const bool SWITCH_NOT_ACTIVATED = HIGH;  //= NormalClosed switch
     const bool SWITCH_NOT_ACTIVATED = LOW;  //= NormalOpen switch
   
 // flags to indicate the state of the switches
@@ -92,7 +93,7 @@
   bool Alarm = false;
 // limit the runtime to protect damage when a switch is never activated
 // runtimeLimit depends on the motorspeed, the diameter of the spool and the door eleavtion height.
-  int runTimeLimit = 5000; // Security runtime limit
+  //int runTimeLimit = 5000; // Security runtime limit
 
 void setup()
 {
