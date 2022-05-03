@@ -165,12 +165,12 @@ void loop()
       Serial.println("The DS1307 is stopped.  Please run the SetTime");
       Serial.println("example to initialize the time and begin running.");
       Serial.println();
-      digitalWrite(alarmLED, HIGH);
+    alarm();
     } else {
       Serial.println("DS1307 read error!  Please check the circuitry.");
       Serial.println();
     }
-    digitalWrite(alarmLED, HIGH);
+    alarm();
     delay(9000); 
   
   }
@@ -293,6 +293,12 @@ void runMotor1Stop() {
 
 }
 
+void alarm() {
+      digitalWrite(alarmLED, HIGH);
+      delay(1000);
+      digitalWrite(alarmLED, LOW);
+      delay(2000);
+}
 
 /*
 // print number as 2-digits in case number is only 1-digit 
