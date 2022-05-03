@@ -91,6 +91,10 @@
 // Security
 // set flag 'Alarm = true' if runtimeLimit is exceeded and no switch is activated (both switches are SWITCH_NOT_ACTIVATED)
   bool Alarm = false;
+  // use LEDS to indicate the program flow
+   const byte nightLED = 2;
+   const byte dayLED = 3;
+   const byte alarmLED = 4;
 // limit the runtime to protect damage when a switch is never activated
 // runtimeLimit depends on the motorspeed, the diameter of the spool and the door eleavtion height.
   //int runTimeLimit = 5000; // Security runtime limit
@@ -106,6 +110,7 @@ void setup()
   Serial.begin(9600);
   
   // initialize pinmodes
+// remove the Enable Jumper to enable-disable the motors with the software code 
 //  pinMode(EN1, OUTPUT);
 //  digitalWrite(EN1,LOW);
   pinMode(IN1, OUTPUT);
@@ -114,6 +119,12 @@ void setup()
   digitalWrite(IN2,LOW);
   pinMode(upperSwitch, INPUT_PULLUP);
   pinMode(lowerSwitch, INPUT_PULLUP);
+  pinMode(dayLED, OUTPUT);
+  digitalWrite(dayLED,LOW);
+  pinMode(nightLED, OUTPUT);
+  digitalWrite(nightLED,LOW);
+  pinMode(alarmLED, OUTPUT);
+  digitalWrite(alarmLED,LOW);
 }
 
 
@@ -154,13 +165,23 @@ void loop()
       Serial.println("The DS1307 is stopped.  Please run the SetTime");
       Serial.println("example to initialize the time and begin running.");
       Serial.println();
-	  // todo GOTO ALARM
+      digitalWrite(alarmLED, HIGH);
     } else {
       Serial.println("DS1307 read error!  Please check the circuitry.");
       Serial.println();
     }
+    digitalWrite(alarmLED, HIGH);
     delay(9000); 
-	  // todo GOTO ALARM	
+  
+  }
+
+  if (nightTime) {
+    digitalWrite(dayLED, LOW);    
+    digitalWrite(nightLED, HIGH);
+  }
+  else {
+    digitalWrite(nightLED, LOW);    
+    digitalWrite(dayLED, HIGH);    
   }
 
   // read the state of the upperSwitch and place it in the variable upperSwitchState
@@ -271,7 +292,6 @@ void runMotor1Stop() {
   digitalWrite(IN2, LOW);
 
 }
-
 
 
 /*
