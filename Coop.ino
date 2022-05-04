@@ -139,21 +139,20 @@ void loop()
 
   if (RTC.read(tm)) {
  
-    // // test print
-    // Serial.print("Ok, Time = ");
-    // print2digits(tm.Hour);
-    // Serial.write(':');
-    // print2digits(tm.Minute);
+    // test print
+    Serial.print("Ok, Time = ");
+    print2digits(tm.Hour);
+    Serial.write(':');
+    print2digits(tm.Minute);
     // Serial.write(':');
     // print2digits(tm.Second);
-    // Serial.print(", Date (D/M/Y) = ");
-    // Serial.print(tm.Day);
-    // Serial.write('/');
-    // Serial.print(tm.Month);
-    // Serial.write('/');
-    // Serial.print(tmYearToCalendar(tm.Year));
-    // Serial.println();
-
+    Serial.print(", Date (D/M/Y) = ");
+    Serial.print(tm.Day);
+    Serial.write('/');
+    Serial.print(tm.Month);
+    Serial.write('/');
+    Serial.print(tmYearToCalendar(tm.Year));
+    Serial.println();
 	
     nightTime = checkNightTime(tm); // check if it is nighttime OR daytime
     // // test print
@@ -165,14 +164,12 @@ void loop()
       Serial.println("The DS1307 is stopped.  Please run the SetTime");
       Serial.println("example to initialize the time and begin running.");
       Serial.println();
-    alarm();
+      alarm(2000, 500);
     } else {
       Serial.println("DS1307 read error!  Please check the circuitry.");
       Serial.println();
+      alarm(500, 500);
     }
-    alarm();
-    delay(9000); 
-  
   }
 
   if (nightTime) {
@@ -293,14 +290,15 @@ void runMotor1Stop() {
 
 }
 
-void alarm() {
+// "flash" alarmLED
+void alarm(int LEDon, int LEDoff) {
       digitalWrite(alarmLED, HIGH);
-      delay(1000);
+      delay(LEDon);
       digitalWrite(alarmLED, LOW);
-      delay(2000);
+      delay(LEDoff);
 }
 
-/*
+
 // print number as 2-digits in case number is only 1-digit 
 void print2digits(int number) {
   if (number >= 0 && number < 10) {
@@ -308,4 +306,3 @@ void print2digits(int number) {
   }
   Serial.print(number);
 }
-*/
