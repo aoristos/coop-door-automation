@@ -53,15 +53,18 @@
   //DS1307RTC.h (author Paul Stoffregen)
   // https://github.com/PaulStoffregen/DS1307RTC/releases
     #include <DS1307RTC.h>
-  
-// Arduino pins for motor 1 
-  // const byte EN1 = 6; // PWM
-  const byte IN1 = 8; // MOTOR1 UP
-  const byte IN2 = 9; // MOTOR1 DOWN
 
-//Arduino pins for the switches
-  const byte upperSwitch = 7;
-  const byte lowerSwitch = 6;
+// Arduino pin configuration  
+  // Arduino pins for motor 1 
+    const byte IN1 = 8; // MOTOR1 UP
+    const byte IN2 = 9; // MOTOR1 DOWN
+  //Arduino pins for the switches
+    const byte upperSwitch = 7;
+    const byte lowerSwitch = 6;
+  // use LEDS to indicate the program flow
+    const byte nightLED = 2;
+    const byte dayLED = 3;
+    const byte alarmLED = 4;
 
 // Arrays with the sunRise and sunSet ephemerides for each month
 // Calculations for Belgium-Bellegem latitude 50,50° / longitude 3,16°  Timezone GMT +1  (no daylight saving time)
@@ -91,10 +94,7 @@
 // Security
 // set flag 'Alarm = true' if runtimeLimit is exceeded and no switch is activated (both switches are SWITCH_NOT_ACTIVATED)
   bool Alarm = false;
-  // use LEDS to indicate the program flow
-   const byte nightLED = 2;
-   const byte dayLED = 3;
-   const byte alarmLED = 4;
+
 // limit the runtime to protect damage when a switch is never activated
 // runtimeLimit depends on the motorspeed, the diameter of the spool and the door eleavtion height.
   //int runTimeLimit = 5000; // Security runtime limit
@@ -102,17 +102,13 @@
 void setup()
 {
  
-// // test print
-  // Serial.println("Dit is de functie void setup()");
-  // delay(3000);
+  // Serial.println("Dit is de functie void setup()"); // TEST_PRINT
+  // delay(3000); // TEST_PRINT
   
-  // initialize serial communication at 9600 bits per second:
+// initialize serial communication at 9600 bits per second:
   Serial.begin(9600);
   
-  // initialize pinmodes
-// remove the Enable Jumper to enable-disable the motors with the software code 
-//  pinMode(EN1, OUTPUT);
-//  digitalWrite(EN1,LOW);
+// initialize pinmodes
   pinMode(IN1, OUTPUT);
   digitalWrite(IN1,LOW);
   pinMode(IN2, OUTPUT);
@@ -131,33 +127,31 @@ void setup()
 void loop()
 { 
 
-// // test print
-  // Serial.println("Dit is de functie void loop()");
-  // delay(3000);
+  // Serial.println("Dit is de functie void loop()"); // TEST_PRINT
+  // delay(3000); // TEST_PRINT
 
   tmElements_t tm;
 
   if (RTC.read(tm)) {
  
-    // test print
-    Serial.print("Ok, Time = ");
-    print2digits(tm.Hour);
-    Serial.write(':');
-    print2digits(tm.Minute);
-    // Serial.write(':');
-    // print2digits(tm.Second);
-    Serial.print(", Date (D/M/Y) = ");
-    Serial.print(tm.Day);
-    Serial.write('/');
-    Serial.print(tm.Month);
-    Serial.write('/');
-    Serial.print(tmYearToCalendar(tm.Year));
-    Serial.println();
+    Serial.print("Ok, Time = "); // TEST_PRINT
+    print2digits(tm.Hour); // TEST_PRINT
+    Serial.write(':'); // TEST_PRINT
+    print2digits(tm.Minute); // TEST_PRINT
+    // Serial.write(':'); // TEST_PRINT
+    // print2digits(tm.Second); // TEST_PRINT
+    Serial.print(", Date (D/M/Y) = "); // TEST_PRINT
+    Serial.print(tm.Day); // TEST_PRINT
+    Serial.write('/'); // TEST_PRINT
+    Serial.print(tm.Month); // TEST_PRINT
+    Serial.write('/'); // TEST_PRINT
+    Serial.print(tmYearToCalendar(tm.Year)); // TEST_PRINT
+    Serial.println(); // TEST_PRINT
 	
     nightTime = checkNightTime(tm); // check if it is nighttime OR daytime
-    // // test print
-	  // Serial.print("the value of nightTime is now ");
-	  // Serial.println(nightTime);
+    
+	  // Serial.print("the value of nightTime is now "); // TEST_PRINT
+	  // Serial.println(nightTime); // TEST_PRINT
     
   } else {
     if (RTC.chipPresent()) {
@@ -190,29 +184,27 @@ void loop()
   if (nightTime == false && upperSwitchState == SWITCH_NOT_ACTIVATED) {
     runMotor1Up();     // call function runMotor1Up()
 	
-	  // // test print
-    // TEST Serial.print("runMotor1Up running :");
-    // TEST Serial.println(upperSwitchState); 
+    // Serial.print("runMotor1Up running :"); // TEST_PRINT
+    // Serial.println(upperSwitchState); // TEST_PRINT
 
   }  
   // else runMotor1Down if it is nighttime AND the lowerSwitchstate is SWITCH_NOT_ACTIVATED
   else if (nightTime == true && lowerSwitchState == SWITCH_NOT_ACTIVATED) {
     runMotor1Down();     // call function runMotor1Down()
 
-	  // // test print
-    // Serial.print("runMotor1Down running :");
-    // Serial.println(lowerSwitchState); 
+	  
+    // Serial.print("runMotor1Down running :"); // TEST_PRINT
+    // Serial.println(lowerSwitchState); // TEST_PRINT
 
   }
   // else runMotor1Stop
   else {
     runMotor1Stop(); // stop the motor
-
-	   // // test print
-    // Serial.print("runMotor1Up stopped :");
-    // Serial.println(upperSwitchState);
-    // Serial.print("runMotor1Down stopped :");
-    // Serial.println(lowerSwitchState);
+	   
+    // Serial.print("runMotor1Up stopped :"); // TEST_PRINT
+    // Serial.println(upperSwitchState); // TEST_PRINT
+    // Serial.print("runMotor1Down stopped :"); // TEST_PRINT
+    // Serial.println(lowerSwitchState); // TEST_PRINT
   }
 
 }
@@ -221,7 +213,7 @@ void loop()
 // this function uses the type 'tmElements_ts' object 'tm' from the 'DS1307RTC.h' library
 bool checkNightTime(tmElements_t tm){
 
-  // // test print
+  
   // Serial.println("Dit is CheckNighTime()");
   // delay(3000);
 
@@ -229,24 +221,24 @@ bool checkNightTime(tmElements_t tm){
   sunRiseNow = sun_rise[(tm.Month -1)] + sunRiseOffset;  // Find the appropriate time in the array sun_rise[] and add a safety offset time (e.g. 30 minutes) to avoid a premature wake up.
   sunSetNow = sun_set [(tm.Month -1)] + sunSetOffset;  // Find the appropriate time in the array sun_set[] and add a safety offset time (e.g. 60 minutes) to avoid "locked-out" chickens.
   clockTimeNow = (tm.Hour-summerTimeOffset) * 60 + tm.Minute; // clockTimeNow in minutes: substract 1 Hour (summerTimeOffset) when the clock runs in summertime 
-    
-  // //test print
+
   /*
-    Serial.print("sunRiseNow is ");  
-    Serial.print(sunRiseNow);
-    Serial.print("       sunSetNow is ");   
-    Serial.print(sunSetNow);
-    Serial.print("       clockTimeNow is ");  
-    Serial.println(clockTimeNow);
+    Serial.print("sunRiseNow is "); // TEST_PRINT 
+    Serial.print(sunRiseNow); // TEST_PRINT
+    Serial.print("       sunSetNow is "); // TEST_PRINT   
+    Serial.print(sunSetNow); // TEST_PRINT
+    Serial.print("       clockTimeNow is "); // TEST_PRINT  
+    Serial.println(clockTimeNow); // TEST_PRINT
   */
+  
   bool nightTime = true; // it is nighttime except if the clocktime is between sunrise and sunset
   if ((clockTimeNow >= sunRiseNow) && (clockTimeNow <= sunSetNow)){
     nightTime = false; // it is daytime if the clocktime is between sunrise and sunset
   }
   
-  // // test print
-  // Serial.print("the value of nightTime is now ");
-  // Serial.println(nightTime);
+  
+  // Serial.print("the value of nightTime is now "); // TEST_PRINT
+  // Serial.println(nightTime); // TEST_PRINT
 
   return nightTime;
 }
@@ -255,14 +247,18 @@ bool checkNightTime(tmElements_t tm){
 // this function activates runMotor1Up
 void runMotor1Up() {  
 
-  // // test print
-    // Serial.println("Dit is de functie void runMotor1Up()");
-    // delay(3000);
+  
+    Serial.println("Dit is de functie void runMotor1Up()"); // TEST_PRINT
+    // delay(3000); // TEST_PRINT
 
   // runMotor1Up as long as the upperSwitch is not activated
   while(digitalRead(upperSwitch) == SWITCH_NOT_ACTIVATED) {
     digitalWrite(IN1,HIGH);
     digitalWrite(IN2, LOW);
+
+    Serial.println("Dit is de while() loop in runMotor1Up()"); // TEST_PRINT
+    // delay(3000); // TEST_PRINT
+  
   }
 
   // run motor1Stop() as soon as the upperSwitch is activated : the door is open.
@@ -273,28 +269,29 @@ void runMotor1Up() {
 // this function activates runMotor1Down
 void runMotor1Down() { 
 
-// //test print
-  // Serial.println("Dit is de functie void runMotor1Down()");
-  // delay(3000);
+  Serial.println("Dit is de functie void runMotor1Down()"); // TEST_PRINT
+  // delay(3000); // TEST_PRINT
 
   // runMotor1Up as long as the lowerSwitch is not activated
   while(digitalRead(lowerSwitch) == SWITCH_NOT_ACTIVATED) {   
     digitalWrite(IN1,LOW);
     digitalWrite(IN2, HIGH);
+
+    Serial.println("Dit is de while() loop in runMotor1Down()"); // TEST_PRINT
+    // delay(3000); // TEST_PRINT
+  
   }
 
   // run motor1Stop() as soon as the lowerSwitch is activated : the door is closed.
-  runMotor1Stop();
-  
+  runMotor1Stop();  
 }
 
 
 // this function stops motor1
 void runMotor1Stop() {
 
-// // test print
-  // Serial.println("Dit is de functie void runMotor1Stop()");
-  // delay(3000);
+  // Serial.println("Dit is de functie void runMotor1Stop()"); // TEST_PRINT
+  // delay(3000); // TEST_PRINT
   
   digitalWrite(IN1, LOW);
   digitalWrite(IN2, LOW);
