@@ -258,10 +258,15 @@ void runMotor1Up() {
   // // test print
     // Serial.println("Dit is de functie void runMotor1Up()");
     // delay(3000);
-  
-  digitalWrite(IN1,HIGH);
-  digitalWrite(IN2, LOW);
-  
+
+  // runMotor1Up as long as the upperSwitch is not activated
+  while(digitalRead(upperSwitch) == SWITCH_NOT_ACTIVATED) {
+    digitalWrite(IN1,HIGH);
+    digitalWrite(IN2, LOW);
+  }
+
+  // run motor1Stop() as soon as the upperSwitch is activated : the door is open.
+  runMotor1Stop();
 }
 
 
@@ -271,9 +276,15 @@ void runMotor1Down() {
 // //test print
   // Serial.println("Dit is de functie void runMotor1Down()");
   // delay(3000);
-   
-  digitalWrite(IN1,LOW);
-  digitalWrite(IN2, HIGH);
+
+  // runMotor1Up as long as the lowerSwitch is not activated
+  while(digitalRead(lowerSwitch) == SWITCH_NOT_ACTIVATED) {   
+    digitalWrite(IN1,LOW);
+    digitalWrite(IN2, HIGH);
+  }
+
+  // run motor1Stop() as soon as the lowerSwitch is activated : the door is closed.
+  runMotor1Stop();
   
 }
 
