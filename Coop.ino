@@ -210,36 +210,38 @@ void loop()
   // <Button>.pressed() RETURNS true IF THE STATE CHANGED
   // AND THE CURRENT STATE MATCHES <Button>.setPressedState(<HIGH or LOW>);
   // WHICH IS LOW IN THIS EXAMPLE AS SET WITH button.setPressedState(LOW); IN setup()
-  if(button.pressed()) {
-    
-    buttonPressedFlag = true;    
-    //Serial.print("button.pressed() = "); // TEST_PRINT
-    //Serial.println(button.pressed()); // TEST_PRINT
-    Serial.print("buttonPressedFlag = "); // TEST_PRINT
-    Serial.println(buttonPressedFlag); // TEST_PRINT
-     
-    if(digitalRead(upperSwitch) == SWITCH_IS_ACTIVATED){
-      runMotor1Down();
+    if(button.pressed()) {
+
+      if((digitalRead(upperSwitch) == SWITCH_IS_ACTIVATED) && (digitalRead(lowerSwitch) == SWITCH_IS_ACTIVATED)){
+        // activate both upperSwitch AND lowerSwitch to clear the buttonPressedFlag
+        buttonPressedFlag = false;
+          //Serial.print("button.pressed() = "); // TEST_PRINT
+          //Serial.println(button.pressed()); // TEST_PRINT
+          Serial.print("2) buttonPressedFlag = "); // TEST_PRINT
+          Serial.println(buttonPressedFlag); // TEST_PRINT
+        runMotor1Stop();
       }
 
-    // Activate both upperSwitch AND lowerSwitch to clear the buttonPressedFlag
-    else if(digitalRead(upperSwitch) == SWITCH_IS_ACTIVATED && digitalRead(lowerSwitch) == SWITCH_IS_ACTIVATED){
-      buttonPressedFlag = false;
-      //Serial.print("button.pressed() = "); // TEST_PRINT
-      //Serial.println(button.pressed()); // TEST_PRINT
-      Serial.print("buttonPressedFlag = "); // TEST_PRINT
-      Serial.println(buttonPressedFlag); // TEST_PRINT
-      runMotor1Stop();
+      else if(digitalRead(upperSwitch) == SWITCH_IS_ACTIVATED){
+        // upperSwitch is activated: close the door
+        buttonPressedFlag = true;
+        //Serial.print("button.pressed() = "); // TEST_PRINT
+        //Serial.println(button.pressed()); // TEST_PRINT
+        Serial.print("1) buttonPressedFlag = "); // TEST_PRINT
+        Serial.println(buttonPressedFlag); // TEST_PRINT 
+        runMotor1Down();
       }
-
-    else{
+      else{
+        // the lowerSwitch is activated: open the door
+        buttonPressedFlag = true;
+          //Serial.print("button.pressed() = "); // TEST_PRINT
+          //Serial.println(button.pressed()); // TEST_PRINT
+          Serial.print("3) buttonPressedFlag = "); // TEST_PRINT
+          Serial.println(buttonPressedFlag); // TEST_PRINT
         runMotor1Up();
       }
-      
-      button.update();
+
     }
-
-
 
 
   // read the state of the upperSwitch and place it in the variable upperSwitchState
@@ -247,33 +249,40 @@ void loop()
   // read the state of the lowerSwitch and place it in the variable lowerSwitchState
     lowerSwitchState = digitalRead(lowerSwitch);
 
-  // run Motor1Up if it is daytime AND the upperSwitchstate is SWITCH_NOT_ACTIVATED
-  if (nightTime == false && upperSwitchState == SWITCH_NOT_ACTIVATED) {
-    runMotor1Up();     // call function runMotor1Up()
-	
-    // Serial.print("runMotor1Up running :"); // TEST_PRINT
-    // Serial.println(upperSwitchState); // TEST_PRINT
+  /*
+   * Avoid the normal open-close routine when in manual mode (when the button is pressed)
+   * Only allow motor activation when the buttonPressedFlag == false
+   */
+  if(buttonPressedFlag == false){
 
-  }  
-  // else runMotor1Down if it is nighttime AND the lowerSwitchstate is SWITCH_NOT_ACTIVATED
-  else if (nightTime == true && lowerSwitchState == SWITCH_NOT_ACTIVATED) {
-    runMotor1Down();     // call function runMotor1Down()
+    // run Motor1Up if it is daytime AND the upperSwitchstate is SWITCH_NOT_ACTIVATED
+    if (nightTime == false && upperSwitchState == SWITCH_NOT_ACTIVATED) {
+      runMotor1Up();     // call function runMotor1Up()
+    
+      // Serial.print("runMotor1Up running :"); // TEST_PRINT
+      // Serial.println(upperSwitchState); // TEST_PRINT
 
-	  
-    // Serial.print("runMotor1Down running :"); // TEST_PRINT
-    // Serial.println(lowerSwitchState); // TEST_PRINT
+    } 
 
-  }
+    // else runMotor1Down if it is nighttime AND the lowerSwitchstate is SWITCH_NOT_ACTIVATED
+    else if (nightTime == true && lowerSwitchState == SWITCH_NOT_ACTIVATED) {
+      runMotor1Down();     // call function runMotor1Down()
+      
+      // Serial.print("runMotor1Down running :"); // TEST_PRINT
+      // Serial.println(lowerSwitchState); // TEST_PRINT
+
+    }
+
   // else runMotor1Stop
-  else {
-    runMotor1Stop(); // stop the motor
-	   
-    // Serial.print("runMotor1Up stopped :"); // TEST_PRINT
-    // Serial.println(upperSwitchState); // TEST_PRINT
-    // Serial.print("runMotor1Down stopped :"); // TEST_PRINT
-    // Serial.println(lowerSwitchState); // TEST_PRINT
+    else {
+      runMotor1Stop(); // stop the motor
+      
+      // Serial.print("runMotor1Up stopped :"); // TEST_PRINT
+      // Serial.println(upperSwitchState); // TEST_PRINT
+      // Serial.print("runMotor1Down stopped :"); // TEST_PRINT
+      // Serial.println(lowerSwitchState); // TEST_PRINT
+    }
   }
-
 }
 
 // function to check if it's day or night
