@@ -54,6 +54,11 @@
   //DS1307RTC.h (author Paul Stoffregen)
   // https://github.com/PaulStoffregen/DS1307RTC/releases
     #include <DS1307RTC.h>
+  // https://github.com/thomasfredericks/Bounce2
+    #include <Bounce2.h>
+
+  // INSTANTIATE A Button OBJECT FROM THE Bounce2 NAMESPACE
+    Bounce2::Button button = Bounce2::Button();
 
 // Arduino pin configuration  
   // Arduino pins for motor 1 
@@ -62,6 +67,8 @@
   //Arduino pins for the switches
     const byte upperSwitch = 7;
     const byte lowerSwitch = 6;
+  // Arduino pins for button
+    const byte toggleButton = 10;  
   // use LEDS to indicate the program flow
     const byte nightLED = 11;
     const byte dayLED = 12;
@@ -96,6 +103,9 @@
 // set flag 'Alarm = true' if runtimeLimit is exceeded and no switch is activated (both switches are SWITCH_NOT_ACTIVATED)
   bool Alarm = false;
 
+// set buttonPressedFlag when Button.pressed()== true;
+  bool buttonPressedFlag;
+
 // limit the runtime to protect damage when a switch is never activated
 // runtimeLimit depends on the motorspeed, the diameter of the spool and the door eleavtion height.
   //int runTimeLimit = 5000; // Security runtime limit
@@ -122,6 +132,15 @@ void setup()
   digitalWrite(nightLED,LOW);
   pinMode(alarmLED, OUTPUT);
   digitalWrite(alarmLED,LOW);
+
+// Set the Bounce2 connection parameters
+  // IF YOUR INPUT HAS AN INTERNAL PULL-UP
+    button.attach( toggleButton, INPUT_PULLUP ); // USE INTERNAL PULL-UP
+  // DEBOUNCE INTERVAL IN MILLISECONDS
+    button.interval(5); // interval in ms
+  // INDICATE THAT THE LOW STATE CORRESPONDS TO PHYSICALLY PRESSING THE BUTTON
+    button.setPressedState(LOW); 
+
 }
 
 
@@ -167,14 +186,61 @@ void loop()
     }
   }
 
+  // signal LEDs tos show the nightTime value
   if (nightTime) {
+    // it is nighttime
     digitalWrite(dayLED, LOW);    
     digitalWrite(nightLED, HIGH);
   }
   else {
+    // it is daytaime
     digitalWrite(nightLED, LOW);    
     digitalWrite(dayLED, HIGH);    
   }
+
+
+  // Update the Bounce instance (YOU MUST DO THIS EVERY LOOP)
+    button.update();
+  
+    // Serial.print("button.pressed() = "); // TEST_PRINT
+    // Serial.println(button.pressed()); // TEST_PRINT
+    Serial.print("buttonPressedFlag = "); // TEST_PRINT
+    Serial.println(buttonPressedFlag); // TEST_PRINT
+
+  // <Button>.pressed() RETURNS true IF THE STATE CHANGED
+  // AND THE CURRENT STATE MATCHES <Button>.setPressedState(<HIGH or LOW>);
+  // WHICH IS LOW IN THIS EXAMPLE AS SET WITH button.setPressedState(LOW); IN setup()
+  if(button.pressed()) {
+    
+    buttonPressedFlag = true;    
+    //Serial.print("button.pressed() = "); // TEST_PRINT
+    //Serial.println(button.pressed()); // TEST_PRINT
+    Serial.print("buttonPressedFlag = "); // TEST_PRINT
+    Serial.println(buttonPressedFlag); // TEST_PRINT
+     
+    if(digitalRead(upperSwitch) == SWITCH_IS_ACTIVATED){
+      runMotor1Down();
+      }
+
+    // Activate both upperSwitch AND lowerSwitch to clear the buttonPressedFlag
+    else if(digitalRead(upperSwitch) == SWITCH_IS_ACTIVATED && digitalRead(lowerSwitch) == SWITCH_IS_ACTIVATED){
+      buttonPressedFlag = false;
+      //Serial.print("button.pressed() = "); // TEST_PRINT
+      //Serial.println(button.pressed()); // TEST_PRINT
+      Serial.print("buttonPressedFlag = "); // TEST_PRINT
+      Serial.println(buttonPressedFlag); // TEST_PRINT
+      runMotor1Stop();
+      }
+
+    else{
+        runMotor1Up();
+      }
+      
+      button.update();
+    }
+
+
+
 
   // read the state of the upperSwitch and place it in the variable upperSwitchState
     upperSwitchState = digitalRead(upperSwitch);
@@ -254,10 +320,12 @@ void runMotor1Up() {
 
   // runMotor1Up as long as the upperSwitch is not activated
   while(digitalRead(upperSwitch) == SWITCH_NOT_ACTIVATED) {
-    digitalWrite(IN1,HIGH);
+    digitalWrite(IN1, HIGH);
     digitalWrite(IN2, LOW);
 
-    Serial.println("Dit is de while() loop in runMotor1Up()"); // TEST_PRINT
+    // Serial.print("button.pressed() = "); // TEST_PRINT
+    // Serial.println(button.pressed()); // TEST_PRINT
+    //Serial.println("Dit is de while() loop in runMotor1Up()"); // TEST_PRINT
     // delay(3000); // TEST_PRINT
   
   }
@@ -270,15 +338,17 @@ void runMotor1Up() {
 // this function activates runMotor1Down
 void runMotor1Down() { 
 
-  Serial.println("Dit is de functie void runMotor1Down()"); // TEST_PRINT
+  //Serial.println("Dit is de functie void runMotor1Down()"); // TEST_PRINT
   // delay(3000); // TEST_PRINT
 
   // runMotor1Up as long as the lowerSwitch is not activated
   while(digitalRead(lowerSwitch) == SWITCH_NOT_ACTIVATED) {   
-    digitalWrite(IN1,LOW);
+    digitalWrite(IN1, LOW);
     digitalWrite(IN2, HIGH);
 
-    Serial.println("Dit is de while() loop in runMotor1Down()"); // TEST_PRINT
+    // Serial.print("button.pressed() = "); // TEST_PRINT
+    // Serial.println(button.pressed()); // TEST_PRINT
+    //Serial.println("Dit is de while() loop in runMotor1Down()"); // TEST_PRINT
     // delay(3000); // TEST_PRINT
   
   }
