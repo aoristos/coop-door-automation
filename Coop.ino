@@ -15,6 +15,7 @@
  *  <wire.h> the built-in library to communicate with the I2C bus
  *  <TimeLib.h> library ( https://github.com/PaulStoffregen/Time/releases )
  *  <DS1307RTC.h> library ( https://github.com/PaulStoffregen/DS1307RTC/releases )
+ * <Bounce2.h> library ( https://github.com/thomasfredericks/Bounce2)
  * 
  */
 
@@ -62,9 +63,9 @@
     const byte upperSwitch = 7;
     const byte lowerSwitch = 6;
   // use LEDS to indicate the program flow
-    const byte nightLED = 2;
-    const byte dayLED = 3;
-    const byte alarmLED = 4;
+    const byte nightLED = 11;
+    const byte dayLED = 12;
+    const byte alarmLED = 13;
 
 // Arrays with the sunRise and sunSet ephemerides for each month
 // Calculations for Belgium-Bellegem latitude 50,50° / longitude 3,16°  Timezone GMT +1  (no daylight saving time)
