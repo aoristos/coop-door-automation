@@ -1,6 +1,8 @@
  /*
  * Open and close a chicken cooop door, using an Arduino Uno, a MotorShield-L298N and a Real Time Clock DS1307RTC
  * 
+ * version 2.1.0
+ * add a runTimeCounter and a runTimeLimit to avoid damage when the switches fail 
  * version 2.0.1
  * add a pressDownButton and a buttonPressedFlag to create manual modus
  * (set the buttonPressedFlag: press the pressDownButton (= switch to manual modus))
@@ -26,26 +28,38 @@
 
 // ATTENTION: adjust appropriate offset parameters:
 
-  // ATTENTION: subtract 1 hour (tm.Hour - summerTimeOffset) when the DS1307RTC is running in summertime modus (daylight saving time values)(zomertijd)
+  // ATTENTION:
+  // subtract 1 hour (tm.Hour - summerTimeOffset) when the DS1307RTC is running in summertime modus (daylight saving time values)(zomertijd)
     byte summerTimeOffset = 1; // when the clock-time is equal with the summer-time
     // byte summerTimeOffset = 0; // when the clock-time is equal with the winter-time
 
-  // ATTENTION: make sure you leave enough time for the chickens to go to bed
+  // ATTENTION: 
+  // make sure you leave enough time for the chickens to go to bed
   // increase sunSetNow with a safety offset time (e.g. 60 minutes)
     byte sunSetOffset = 60;
-  // ATTENTION: do not wake up the chickens too early
+  // ATTENTION: 
+  // do not wake up the chickens too early
   //increase sunRiseNow with a safety offset time (e.g. 30 minutes)
     byte sunRiseOffset = 30;
   
+  // ATTENTION:
+  // set the valueS for SWITCH_IS_ACTIVATED and SWITCH_NOT_ACTIVATED
   // the HIGH or LOW status depends on the switch type (NORMAL_OPEN or NORMAL_CLOSE), the wiring and the configuration of the switch INPUT PINS
-  // ATTENTION: uncomment the desired values here:
-  
+  // uncomment the desired values here:
+
     //const bool SWITCH_IS_ACTIVATED = LOW; //= NormalClosed switch
     const bool SWITCH_IS_ACTIVATED = HIGH;  //= NormalOpen switch
 
     //const bool SWITCH_NOT_ACTIVATED = HIGH;  //= NormalClosed switch
     const bool SWITCH_NOT_ACTIVATED = LOW;  //= NormalOpen switch
   
+// ATTENTION: 
+// limit the runtime to protect damage when a switch is never activated
+// runTimeLimit depends on the motorspeed, the diameter of the spool and the door elevation height.
+  const byte runTimeLimit = 150; // Security runtime limit
+
+  int runTimeCounter;
+
 // flags to indicate the state of the switches
   bool upperSwitchState; // 'upperSwitchState = SWITCH_IS_ACTIVATED' when the door is fully open
   bool lowerSwitchState; // 'lowerSwitchState = SWITCH_IS_ACTIVATED' when the door is fully closed
@@ -104,16 +118,13 @@
 // 'nighTime = false' when it is day ; 'nighTime = true' when it is night
   bool nightTime;
 
-// Security
-// set flag 'Alarm = true' if runtimeLimit is exceeded and no switch is activated (both switches are SWITCH_NOT_ACTIVATED)
-  bool Alarm = false;
 
 // set buttonPressedFlag when Button.pressed()== true;
   bool buttonPressedFlag;
 
-// limit the runtime to protect damage when a switch is never activated
-// runtimeLimit depends on the motorspeed, the diameter of the spool and the door eleavtion height.
-  //int runTimeLimit = 5000; // Security runtime limit
+// Security
+// set flag 'Alarm = true' if runTimeLimit is exceeded and no switch is activated (both switches are SWITCH_NOT_ACTIVATED)
+  bool Alarm;
 
 void setup()
 {
@@ -145,6 +156,10 @@ void setup()
     button.interval(5); // interval in ms
   // INDICATE THAT THE LOW STATE CORRESPONDS TO PHYSICALLY PRESSING THE BUTTON
     button.setPressedState(LOW); 
+
+  Alarm = false;
+  
+  runTimeCounter = runTimeLimit;
 
 }
 
@@ -184,11 +199,11 @@ void loop()
       // Serial.println("The DS1307 is stopped.  Please run the SetTime");
       // Serial.println("example to initialize the time and begin running.");
       // Serial.println();
-      alarm(2000, 500);
+      flashAlarm(2000, 500);
     } else {
       // Serial.println("DS1307 read error!  Please check the circuitry.");
       // Serial.println();
-      alarm(500, 500);
+      flashAlarm(500, 500);
     }
   }
 
@@ -221,6 +236,8 @@ void loop()
       if((digitalRead(upperSwitch) == SWITCH_IS_ACTIVATED) && (digitalRead(lowerSwitch) == SWITCH_IS_ACTIVATED)){
         // (manually) activate both upperSwitch AND lowerSwitch to clear the buttonPressedFlag
         buttonPressedFlag = false;
+        // reset the runTimeCounter
+        runTimeCounter = runTimeLimit;        
         // set 'alarmLed = LOW' to indicate that the pressedButtonFlag is cleared and we are in automatic modus modus        
         digitalWrite(alarmLED, LOW);
           //// Serial.print("button.pressed() = "); // TEST_PRINT
@@ -239,6 +256,7 @@ void loop()
         //// Serial.println(button.pressed()); // TEST_PRINT
         // Serial.print("1) buttonPressedFlag = "); // TEST_PRINT
         // Serial.println(buttonPressedFlag); // TEST_PRINT 
+        runTimeCounter = runTimeLimit;
         runMotor1Down();
       }
       else{
@@ -250,6 +268,7 @@ void loop()
           //// Serial.println(button.pressed()); // TEST_PRINT
           // Serial.print("3) buttonPressedFlag = "); // TEST_PRINT
           // Serial.println(buttonPressedFlag); // TEST_PRINT
+        runTimeCounter = runTimeLimit;
         runMotor1Up();
       }
 
@@ -270,7 +289,8 @@ void loop()
     // run Motor1Up if it is daytime AND the upperSwitchstate is SWITCH_NOT_ACTIVATED
     if (nightTime == false && upperSwitchState == SWITCH_NOT_ACTIVATED) {
       runMotor1Up();     // call function runMotor1Up()
-    
+      runTimeCounter = runTimeLimit;
+
       // // Serial.print("runMotor1Up running :"); // TEST_PRINT
       // // Serial.println(upperSwitchState); // TEST_PRINT
 
@@ -279,7 +299,8 @@ void loop()
     // else runMotor1Down if it is nighttime AND the lowerSwitchstate is SWITCH_NOT_ACTIVATED
     else if (nightTime == true && lowerSwitchState == SWITCH_NOT_ACTIVATED) {
       runMotor1Down();     // call function runMotor1Down()
-      
+      runTimeCounter = runTimeLimit;
+
       // // Serial.print("runMotor1Down running :"); // TEST_PRINT
       // // Serial.println(lowerSwitchState); // TEST_PRINT
 
@@ -288,7 +309,8 @@ void loop()
   // else runMotor1Stop
     else {
       runMotor1Stop(); // stop the motor
-      
+      runTimeCounter = runTimeLimit;
+
       // // Serial.print("runMotor1Up stopped :"); // TEST_PRINT
       // // Serial.println(upperSwitchState); // TEST_PRINT
       // // Serial.print("runMotor1Down stopped :"); // TEST_PRINT
@@ -344,6 +366,16 @@ void runMotor1Up() {
     digitalWrite(IN1, HIGH);
     digitalWrite(IN2, LOW);
 
+    runTimeCounter --;
+    Serial.print("runTimeCounter = "); // TEST_PRINT
+    Serial.println(runTimeCounter); // TEST_PRINT
+    if(runTimeCounter < 0){
+      Alarm = true;
+      digitalWrite(alarmLED, HIGH);
+      buttonPressedFlag = true; 
+      runMotor1Stop();     
+    }    
+
     // // Serial.print("button.pressed() = "); // TEST_PRINT
     // // Serial.println(button.pressed()); // TEST_PRINT
     //// Serial.println("Dit is de while() loop in runMotor1Up()"); // TEST_PRINT
@@ -366,6 +398,16 @@ void runMotor1Down() {
   while(digitalRead(lowerSwitch) == SWITCH_NOT_ACTIVATED) {   
     digitalWrite(IN1, LOW);
     digitalWrite(IN2, HIGH);
+
+    runTimeCounter --;
+    Serial.print("runTimeCounter = "); // TEST_PRINT
+    Serial.println(runTimeCounter); // TEST_PRINT
+    if(runTimeCounter < 0){
+      Alarm = true;
+      digitalWrite(alarmLED, HIGH);
+      buttonPressedFlag = true; 
+      runMotor1Stop();     
+    }    
 
     // // Serial.print("button.pressed() = "); // TEST_PRINT
     // // Serial.println(button.pressed()); // TEST_PRINT
@@ -391,7 +433,7 @@ void runMotor1Stop() {
 }
 
 // "flash" alarmLED
-void alarm(int LEDon, int LEDoff) {
+void flashAlarm(int LEDon, int LEDoff) {
       digitalWrite(alarmLED, HIGH);
       delay(LEDon);
       digitalWrite(alarmLED, LOW);
@@ -404,5 +446,5 @@ void print2digits(int number) {
   if (number >= 0 && number < 10) {
     Serial.write('0');
   }
-  // Serial.print(number);
+  Serial.print(number);
 }
