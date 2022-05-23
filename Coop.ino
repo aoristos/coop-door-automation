@@ -1,8 +1,10 @@
  /*
  * Open and close a chicken cooop door, using an Arduino Uno, a MotorShield-L298N and a Real Time Clock DS1307RTC
  * 
- * version 2.0.0
- * add a button and a buttonPressedFlag to create manual modus
+ * version 2.0.1
+ * add a pressDownButton and a buttonPressedFlag to create manual modus
+ * (set the buttonPressedFlag: press the pressDownButton (= switch to manual modus))
+ * (clear the buttonPressedFlag: press the pressDownButton while the upperSwitch AND the lowerSwitch are manually activated. (= switch to automatic modus (using the DS1307RTC and the sunRise[] and sunSet[] arrays)))
  *
  * documentation:
  *  "Using a Real Time Clock with Arduino" ( https://dronebotworkshop.com/real-time-clock-arduino/ )
@@ -22,7 +24,7 @@
  * 
  */
 
-// ATTENTION: adjust appropriate offset parameters in the code:
+// ATTENTION: adjust appropriate offset parameters:
 
   // ATTENTION: subtract 1 hour (tm.Hour - summerTimeOffset) when the DS1307RTC is running in summertime modus (daylight saving time values)(zomertijd)
     byte summerTimeOffset = 1; // when the clock-time is equal with the summer-time
@@ -217,8 +219,10 @@ void loop()
     if(button.pressed()) {
 
       if((digitalRead(upperSwitch) == SWITCH_IS_ACTIVATED) && (digitalRead(lowerSwitch) == SWITCH_IS_ACTIVATED)){
-        // activate both upperSwitch AND lowerSwitch to clear the buttonPressedFlag
+        // (manually) activate both upperSwitch AND lowerSwitch to clear the buttonPressedFlag
         buttonPressedFlag = false;
+        // set 'alarmLed = LOW' to indicate that the pressedButtonFlag is cleared and we are in automatic modus modus        
+        digitalWrite(alarmLED, LOW);
           //// Serial.print("button.pressed() = "); // TEST_PRINT
           //// Serial.println(button.pressed()); // TEST_PRINT
           // Serial.print("2) buttonPressedFlag = "); // TEST_PRINT
@@ -229,6 +233,8 @@ void loop()
       else if(digitalRead(upperSwitch) == SWITCH_IS_ACTIVATED){
         // upperSwitch is activated: close the door
         buttonPressedFlag = true;
+        // set 'alarmLed = HIGH' to indicate that the pressedButtonFlag is set and we are in manual modus
+        digitalWrite(alarmLED, HIGH);
         //// Serial.print("button.pressed() = "); // TEST_PRINT
         //// Serial.println(button.pressed()); // TEST_PRINT
         // Serial.print("1) buttonPressedFlag = "); // TEST_PRINT
@@ -236,8 +242,10 @@ void loop()
         runMotor1Down();
       }
       else{
-        // the lowerSwitch is activated: open the door
+        // only the lowerSwitch is activated OR none of the door switches are activated: open the door
         buttonPressedFlag = true;
+        // set 'alarmLed = HIGH' to indicate that the pressedButtonFlag is set and we are in manual modus
+        digitalWrite(alarmLED, HIGH);
           //// Serial.print("button.pressed() = "); // TEST_PRINT
           //// Serial.println(button.pressed()); // TEST_PRINT
           // Serial.print("3) buttonPressedFlag = "); // TEST_PRINT
@@ -254,7 +262,7 @@ void loop()
     lowerSwitchState = digitalRead(lowerSwitch);
 
   /*
-   * Avoid the normal open-close routine when in manual mode (when the button is pressed)
+   * Avoid the normal open-close routine when in manual modus (when the button is pressed)
    * Only allow motor activation when the buttonPressedFlag == false
    */
   if(buttonPressedFlag == false){
