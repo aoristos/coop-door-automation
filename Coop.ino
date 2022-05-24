@@ -56,7 +56,7 @@
 // ATTENTION: 
 // limit the runtime to protect damage when a switch is never activated
 // runTimeLimit depends on the motorspeed, the diameter of the spool and the door elevation height.
-  const byte runTimeLimit = 150; // Security runtime limit
+  const byte runTimeLimit = 200; // Security runtime limit
 
   int runTimeCounter;
 
@@ -207,7 +207,7 @@ void loop()
     }
   }
 
-
+/*
   // signal LEDs tos show the nightTime value
   if (nightTime) {
     // it is nighttime
@@ -215,11 +215,11 @@ void loop()
     digitalWrite(nightLED, HIGH);
   }
   else {
-    // it is daytaime
+    // it is daytime
     digitalWrite(nightLED, LOW);    
     digitalWrite(manualModeLED, HIGH);    
   }
-
+*/
 
   // Update the Bounce instance (YOU MUST DO THIS EVERY LOOP)
     button.update();
@@ -237,10 +237,13 @@ void loop()
     if((digitalRead(upperSwitch) == SWITCH_IS_ACTIVATED) && (digitalRead(lowerSwitch) == SWITCH_IS_ACTIVATED)){
       // (manually) activate both upperSwitch AND lowerSwitch to clear the buttonPressedFlag
       buttonPressedFlag = false;
-      // reset the runTimeCounter
-      runTimeCounter = runTimeLimit;        
-      // set 'alarmLed = LOW' to indicate that the pressedButtonFlag is cleared and we are in automatic modus modus        
+      Alarm = false;   
+      // set 'alarmLed = LOW' to indicate that the pressedButtonFlag is cleared
       digitalWrite(alarmLED, LOW);
+      // set 'manualModeLED = LOW  to indicate that we are in automatic modus modus
+      digitalWrite(manualModeLED, LOW); 
+      // reset the runTimeCounter
+      runTimeCounter = runTimeLimit;    
         //// Serial.print("button.pressed() = "); // TEST_PRINT
         //// Serial.println(button.pressed()); // TEST_PRINT
         // Serial.print("2) buttonPressedFlag = "); // TEST_PRINT
@@ -251,8 +254,8 @@ void loop()
     else if(digitalRead(upperSwitch) == SWITCH_IS_ACTIVATED){
       // upperSwitch is activated: close the door
       buttonPressedFlag = true;
-      // set 'alarmLed = HIGH' to indicate that the pressedButtonFlag is set and we are in manual modus
-      digitalWrite(alarmLED, HIGH);
+      // set 'manualModeLED = HIGH' to indicate that the pressedButtonFlag is set and we are in manual modus
+      digitalWrite(manualModeLED, HIGH);
       //// Serial.print("button.pressed() = "); // TEST_PRINT
       //// Serial.println(button.pressed()); // TEST_PRINT
       // Serial.print("1) buttonPressedFlag = "); // TEST_PRINT
@@ -265,8 +268,8 @@ void loop()
     else{
       // only the lowerSwitch is activated OR none of the door switches are activated: open the door
       buttonPressedFlag = true;
-      // set 'alarmLed = HIGH' to indicate that the pressedButtonFlag is set and we are in manual modus
-      digitalWrite(alarmLED, HIGH);
+      // set 'manualModeLED = HIGH' to indicate that the pressedButtonFlag is set and we are in manual modus
+      digitalWrite(manualModeLED, HIGH);
         //// Serial.print("button.pressed() = "); // TEST_PRINT
         //// Serial.println(button.pressed()); // TEST_PRINT
         // Serial.print("3) buttonPressedFlag = "); // TEST_PRINT
@@ -381,7 +384,7 @@ void runMotor1Up() {
     // Serial.println(runTimeCounter); // TEST_PRINT
     if(runTimeCounter < 0){
       Alarm = true;
-      buttonPressedFlag = true;     
+      //buttonPressedFlag = true;     
     }    
 
     // // Serial.print("button.pressed() = "); // TEST_PRINT
@@ -413,7 +416,7 @@ void runMotor1Down() {
     // Serial.println(runTimeCounter); // TEST_PRINT
     if(runTimeCounter < 0){
       Alarm = true;
-      buttonPressedFlag = true;  
+      //buttonPressedFlag = true;  
     }    
 
     // // Serial.print("button.pressed() = "); // TEST_PRINT
