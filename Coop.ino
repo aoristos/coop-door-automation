@@ -90,7 +90,7 @@
     const byte pressDownButton = 2;  
   // use LEDS to indicate the program flow
     const byte nightLED = 11;
-    const byte dayLED = 12;
+    const byte manualModeLED = 12;
     const byte alarmLED = 13;
 
 // Arrays with the sunRise and sunSet ephemerides for each month
@@ -142,8 +142,8 @@ void setup()
   digitalWrite(IN2,LOW);
   pinMode(upperSwitch, INPUT_PULLUP);
   pinMode(lowerSwitch, INPUT_PULLUP);
-  pinMode(dayLED, OUTPUT);
-  digitalWrite(dayLED,LOW);
+  pinMode(manualModeLED, OUTPUT);
+  digitalWrite(manualModeLED,LOW);
   pinMode(nightLED, OUTPUT);
   digitalWrite(nightLED,LOW);
   pinMode(alarmLED, OUTPUT);
@@ -211,13 +211,13 @@ void loop()
   // signal LEDs tos show the nightTime value
   if (nightTime) {
     // it is nighttime
-    digitalWrite(dayLED, LOW);    
+    digitalWrite(manualModeLED, LOW);    
     digitalWrite(nightLED, HIGH);
   }
   else {
     // it is daytaime
     digitalWrite(nightLED, LOW);    
-    digitalWrite(dayLED, HIGH);    
+    digitalWrite(manualModeLED, HIGH);    
   }
 
 
