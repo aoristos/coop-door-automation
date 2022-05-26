@@ -59,14 +59,32 @@
 // ATTENTION: 
 // limit the runtime to protect damage when a switch is never activated
 // runTimeLimit depends on the motorspeed, the diameter of the spool and the door elevation height.
-  const byte runTimeLimit = 220; // Security runtime limit
+   const byte runTimeLimit = 220; // Security runtime limit
 
-  int runTimeCounter;
+   int runTimeCounter;
 
 // flags to indicate the state of the switches
   bool upperSwitchState; // 'upperSwitchState = SWITCH_IS_ACTIVATED' when the door is fully open
   bool lowerSwitchState; // 'lowerSwitchState = SWITCH_IS_ACTIVATED' when the door is fully closed
 
+// store today's sunrise and sunset 'minutes after midnight'
+  int sunRiseNow;
+  int sunSetNow;
+// store the clocktime (value in minutes) after reading the DS1307RTC
+  int clockTimeNow;
+
+// flag to indicate daytime or nighttime
+// 'nightTime = false' when it is day ; 'nightTime = true' when it is night
+  bool nightTime;
+
+
+// set buttonPressedFlag when Button.pressed()== true;
+  bool buttonPressedFlag;
+
+// Security
+// set flag 'Alarm = true' if runTimeLimit is exceeded and no switch is activated (both switches are SWITCH_NOT_ACTIVATED)
+  bool Alarm;
+  
 // include libraries
   // built-in library <wire.h> serves the communication with the I2C bus
     #include <Wire.h>
@@ -112,24 +130,6 @@
   //Jan   Feb   Mar   Apr   May   Jun   Jul   Aug   Sep   Oct   Nov   Dec
   1022, 1072, 1120, 1170, 1218, 1256, 1259, 1221, 1158, 1091, 1032, 1004};
   // 17:01, 17:51, 18:40, 19:30, 20:17, 20:56, 20:59, 20:20, 19:17, 18:11, 17:11, 16:43      - Times are GMT+1 no summer saving as clock isn't adjusted
-
-// store today's sunrise and sunset 'minutes after midnight'
-  int sunRiseNow;
-  int sunSetNow;
-// store the clocktime (value in minutes) after reading the DS1307RTC
-  int clockTimeNow;
-
-// flag to indicate daytime or nighttime
-// 'nighTime = false' when it is day ; 'nighTime = true' when it is night
-  bool nightTime;
-
-
-// set buttonPressedFlag when Button.pressed()== true;
-  bool buttonPressedFlag;
-
-// Security
-// set flag 'Alarm = true' if runTimeLimit is exceeded and no switch is activated (both switches are SWITCH_NOT_ACTIVATED)
-  bool Alarm;
 
 void setup()
 {
@@ -351,7 +351,7 @@ void loop()
 bool checkNightTime(tmElements_t tm){
 
   
-  // Serial.println("Dit is CheckNighTime()");
+  // Serial.println("Dit is CheckNightTime()");
   // delay(3000);
 
   // ! (tm.Month-1) because the first element of an array is at index 0 (the array positions count from [0] to [11])
