@@ -1,6 +1,8 @@
  /*
  * Open and close a chicken cooop door, using an Arduino Uno, a MotorShield-L298N and a Real Time Clock DS1307RTC
  * 
+ * version 2.2.1
+ * reset Alarm (Alarm = false) when nightTime Changes
  * version 2.2.0
  * debug: check Alarm-conditon in the while-loops: code O.K.
  * synchronize codes coop.ino  v2.1.1 with 'cooptest.ino' v2.1.1
@@ -57,11 +59,11 @@
     const bool SWITCH_NOT_ACTIVATED = LOW;  //= NormalOpen switch
   
 // ATTENTION: 
-// limit the runtime to protect damage when a switch is never activated
-// runTimeLimit depends on the motorspeed, the diameter of the spool and the door elevation height.
-   const byte runTimeLimit = 220; // Security runtime limit
+  // limit the runtime to protect damage when a switch is never activated
+  // runTimeLimit depends on the motorspeed, the diameter of the spool and the door elevation height.
+    const byte runTimeLimit = 220; // Security runtime limit
 
-   int runTimeCounter;
+  int runTimeCounter;
 
 // flags to indicate the state of the switches
   bool upperSwitchState; // 'upperSwitchState = SWITCH_IS_ACTIVATED' when the door is fully open
@@ -76,6 +78,8 @@
 // flag to indicate daytime or nighttime
 // 'nightTime = false' when it is day ; 'nightTime = true' when it is night
   bool nightTime;
+// Boolean flag to set when nightTime has changed  
+  bool nightTimeHasChanged;
 
 
 // set buttonPressedFlag when Button.pressed()== true;
@@ -84,7 +88,7 @@
 // Security
 // set flag 'Alarm = true' if runTimeLimit is exceeded and no switch is activated (both switches are SWITCH_NOT_ACTIVATED)
   bool Alarm;
-  
+
 // include libraries
   // built-in library <wire.h> serves the communication with the I2C bus
     #include <Wire.h>
@@ -218,8 +222,17 @@ void loop()
   }
 
 
-
-  // nightTime = digitalRead(nightTimePin); // TEST_WITHOUT_CLOCK
+// Reset Alarm to 'false' when nightTime has changed
+  nightTimeHasChanged = nightTime;
+  nightTime = digitalRead(nightTimePin); // TEST_WITHOUT_CLOCK
+  if(nightTime != nightTimeHasChanged){
+    Alarm = false;
+    // Serial.print("nightTimeHasChanged =  ");
+    // Serial.println(nightTimeHasChanged);
+    // Serial.print("nightTime =  ");
+    // Serial.println(nightTime);
+    // delay(3000);
+  }
 	  // Serial.print("nightTime = "); // TEST_WITHOUT_CLOCK
 	  // Serial.println(nightTime); // TEST_WITHOUT_CLOCK
 
