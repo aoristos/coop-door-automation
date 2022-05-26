@@ -1,6 +1,7 @@
  /*
  * Open and close a chicken cooop door, using an Arduino Uno, a MotorShield-L298N and a Real Time Clock DS1307RTC
- * 
+ * version 2.2.2
+ * increase the runTimeCounter with a safety margin when the door opens (runMotor1Up())  
  * version 2.2.1
  * reset Alarm (Alarm = false) when nightTime Changes
  * version 2.2.0
@@ -35,8 +36,9 @@
 
   // ATTENTION:
   // subtract 1 hour (tm.Hour - summerTimeOffset) when the DS1307RTC is running in summertime modus (daylight saving time values)(zomertijd)
-    byte summerTimeOffset = 1; // when the clock-time is equal with the summer-time
-    // byte summerTimeOffset = 0; // when the clock-time is equal with the winter-time
+  // because the sunRise[] and sunSet[] ephemerides are all wintertime
+    byte summerTimeOffset = 1; // when the clock-time is running in summer-time
+    // byte summerTimeOffset = 0; // when the clock-time is running in winter-time
 
   // ATTENTION: 
   // make sure you leave enough time for the chickens to go to bed
@@ -58,12 +60,12 @@
     //const bool SWITCH_NOT_ACTIVATED = HIGH;  //= NormalClosed switch
     const bool SWITCH_NOT_ACTIVATED = LOW;  //= NormalOpen switch
   
-// ATTENTION: 
+  // ATTENTION: 
   // limit the runtime to protect damage when a switch is never activated
   // runTimeLimit depends on the motorspeed, the diameter of the spool and the door elevation height.
-    const byte runTimeLimit = 220; // Security runtime limit
-
-  int runTimeCounter;
+    const byte runTimeLimit = 220; // Security runTime limit
+    const byte runTimeAdd = 10; // runTime Supplement as safety buffer when the door opens (runMotor1Up())
+    int runTimeCounter;
 
 // flags to indicate the state of the switches
   bool upperSwitchState; // 'upperSwitchState = SWITCH_IS_ACTIVATED' when the door is fully open
@@ -222,9 +224,10 @@ void loop()
   }
 
 
+
 // Reset Alarm to 'false' when nightTime has changed
   nightTimeHasChanged = nightTime;
-  nightTime = digitalRead(nightTimePin); // TEST_WITHOUT_CLOCK
+  // nightTime = digitalRead(nightTimePin); // TEST_WITHOUT_CLOCK
   if(nightTime != nightTimeHasChanged){
     Alarm = false;
     // Serial.print("nightTimeHasChanged =  ");
@@ -396,9 +399,11 @@ bool checkNightTime(tmElements_t tm){
 // this function activates runMotor1Up
 void runMotor1Up() {  
 
-  
-    // Serial.println("Dit is de functie void runMotor1Up()"); // TEST_PRINT
-    // delay(3000); // TEST_PRINT
+  Serial.println("Dit is de functie void runMotor1Up()"); // TEST_PRINT
+  // delay(3000); // TEST_PRINT
+
+  // increase the runTimeCounter with a safety buffer 
+  runTimeCounter = runTimeCounter + runTimeAdd;
 
   // runMotor1Up as long as the upperSwitch is not activated
   while((digitalRead(upperSwitch) == SWITCH_NOT_ACTIVATED) && Alarm == false) {
