@@ -1,14 +1,17 @@
  /*
  * Open and close a chicken cooop door, using an Arduino Uno, a MotorShield-L298N and a Real Time Clock DS1307RTC
+ 
+ * version 2.3.0
+ * 	replace runTimeLimit with dedicated variables UpTimeLimit and DownTimeLimit
  * version 2.2.2
- * increase the runTimeCounter with a safety margin when the door opens (runMotor1Up())  
+ * 	increase the runTimeCounter with a safety margin when the door opens (runMotor1Up())  
  * version 2.2.1
- * reset Alarm (Alarm = false) when nightTime Changes
+ * 	reset Alarm (Alarm = false) when nightTime Changes
  * version 2.2.0
- * debug: check Alarm-conditon in the while-loops: code O.K.
- * synchronize codes coop.ino  v2.1.1 with 'cooptest.ino' v2.1.1
+ * 	debug: check Alarm-conditon in the while-loops: code O.K.
+ * 	synchronize codes coop.ino  v2.1.1 with 'cooptest.ino' v2.1.1
  * version 2.1.1
- * add a runTimeCounter and a runTimeLimit to avoid damage when the switches fail 
+ * 	add a runTimeCounter and a runTimeLimit to avoid damage when the switches fail 
  * version 2.0.1
  * add a pressDownButton and a buttonPressedFlag to create manual modus
  * (to set the buttonPressedFlag: press the pressDownButton (= switch to manual modus))
@@ -61,10 +64,16 @@
     const bool SWITCH_NOT_ACTIVATED = LOW;  //= NormalOpen switch
   
   // ATTENTION: 
-  // limit the runtime to protect damage when a switch is never activated
-  // runTimeLimit depends on the motorspeed, the diameter of the spool and the door elevation height.
-    const byte runTimeLimit = 220; // Security runTime limit
-    const byte runTimeAdd = 10; // runTime Supplement as safety buffer when the door opens (runMotor1Up())
+    // limit the runtime to protect damage when a switch is never activated
+    // runtime depends on the motorspeed, the diameter of the spool and the door elevation height.
+    const byte DownTimeLimit = 220; // Security runtime limit for door closing cyle.
+  
+  // ATTENTION: 
+    // increase the runTimeCounter with a extra buffer time
+  // only apply this incremented runTimeCounter when lifting the door (runMotor1Up())
+    // obstruction during the door closing will exceed the runTimeCounter, trigger the Alarm flag and may cause slack in the suspension rope. So the door lifting may once again exceed the runTimeLimit, trigger the Alarm and never activate the upperSwitch. Therefore the UptimeLimit should be a little bit higher than the DownTimeLimit.
+
+    const byte UpTimeLimit = 230; // Security runTime limit for door opening cyle.
     int runTimeCounter;
 
 // flags to indicate the state of the switches
@@ -171,8 +180,6 @@ void setup()
 
     Alarm = false;
 
-    runTimeCounter = runTimeLimit;
-
 }
 
 
@@ -274,8 +281,7 @@ void loop()
       digitalWrite(alarmLED, LOW);
       // set 'manualModeLED = LOW  to indicate that we are in automatic modus modus
       digitalWrite(manualModeLED, LOW); 
-      // reset the runTimeCounter
-      runTimeCounter = runTimeLimit;    
+   
         // Serial.print("2) buttonPressedFlag = "); // TEST_PRINT
         // Serial.println(buttonPressedFlag); // TEST_PRINT
       runMotor1Stop();
@@ -290,7 +296,7 @@ void loop()
       // Serial.println(buttonPressedFlag); // TEST_PRINT 
 
       // reset the runTimeCounter
-      runTimeCounter = runTimeLimit;
+      runTimeCounter = DownTimeLimit;
       runMotor1Down();
     }
 
@@ -303,7 +309,7 @@ void loop()
         // Serial.println(buttonPressedFlag); // TEST_PRINT
 
       // reset the runTimeCounter
-      runTimeCounter = runTimeLimit;
+      runTimeCounter = UpTimeLimit;
       runMotor1Up();
     }
 
@@ -322,9 +328,9 @@ void loop()
 
     // run Motor1Up if it is daytime AND the upperSwitchstate is SWITCH_NOT_ACTIVATED
     if (nightTime == false && upperSwitchState == SWITCH_NOT_ACTIVATED) {
-      runMotor1Up();     // call function runMotor1Up()
-      // reset the runTimeCounter when runTimeLimit has not been exceeded
-      runTimeCounter = runTimeLimit;
+
+      runTimeCounter = UpTimeLimit; // reset the runTimeCounter
+      runMotor1Up(); // call function runMotor1Up()
 
       // // Serial.print("runMotor1Up running :"); // TEST_PRINT
       // // Serial.println(upperSwitchState); // TEST_PRINT
@@ -333,9 +339,9 @@ void loop()
 
     // else runMotor1Down if it is nighttime AND the lowerSwitchstate is SWITCH_NOT_ACTIVATED
     else if (nightTime == true && lowerSwitchState == SWITCH_NOT_ACTIVATED) {
-      runMotor1Down();     // call function runMotor1Down()
-      // reset the runTimeCounter when runTimeLimit has not been exceeded
-      runTimeCounter = runTimeLimit;
+
+      runTimeCounter = DownTimeLimit; // reset the runTimeCounter
+      runMotor1Down(); // call function runMotor1Down()
 
       // // Serial.print("runMotor1Down running :"); // TEST_PRINT
       // // Serial.println(lowerSwitchState); // TEST_PRINT
@@ -345,8 +351,6 @@ void loop()
   // else runMotor1Stop
     else {
       runMotor1Stop(); // stop the motor
-      // reset the runTimeCounter
-      runTimeCounter = runTimeLimit;
       
       // // Serial.print("runMotor1Up stopped :"); // TEST_PRINT
       // // Serial.println(upperSwitchState); // TEST_PRINT
@@ -402,8 +406,6 @@ void runMotor1Up() {
   Serial.println("Dit is de functie void runMotor1Up()"); // TEST_PRINT
   // delay(3000); // TEST_PRINT
 
-  // increase the runTimeCounter with a safety buffer 
-  runTimeCounter = runTimeCounter + runTimeAdd;
 
   // runMotor1Up as long as the upperSwitch is not activated
   while((digitalRead(upperSwitch) == SWITCH_NOT_ACTIVATED) && Alarm == false) {
@@ -412,8 +414,8 @@ void runMotor1Up() {
 
     // Security
     runTimeCounter --;
-    Serial.print("runTimeCounter = "); // TEST_PRINT
-    Serial.println(runTimeCounter); // TEST_PRINT
+    // Serial.print("runTimeCounter = "); // TEST_PRINT
+    // Serial.println(runTimeCounter); // TEST_PRINT
     if(runTimeCounter <= 0){
       Alarm = true;
       //buttonPressedFlag = true;
