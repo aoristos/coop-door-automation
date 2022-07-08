@@ -1,6 +1,8 @@
  /*
  * Open and close a chicken cooop door, using an Arduino Uno, a MotorShield-L298N and a Real Time Clock DS1307RTC
- 
+
+ * version 3.0.0
+ *  eliminate the blocking effect of the Alarm-status
  * version 2.3.0
  * 	replace runTimeLimit with dedicated variables UpTimeLimit and DownTimeLimit
  * version 2.2.2
@@ -444,8 +446,8 @@ void runMotor1Down() {
 
     // Security
     runTimeCounter --;
-    Serial.print("runTimeCounter = "); // TEST_PRINT
-    Serial.println(runTimeCounter); // TEST_PRINT
+    // Serial.print("runTimeCounter = "); // TEST_PRINT
+    // Serial.println(runTimeCounter); // TEST_PRINT
     if(runTimeCounter <= 0){
       Alarm = true;
       //buttonPressedFlag = true;
