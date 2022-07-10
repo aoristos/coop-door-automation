@@ -1,7 +1,7 @@
  /*
  * Open and close a chicken cooop door, using an Arduino Uno, a MotorShield-L298N and a Real Time Clock DS1307RTC
 
- * version 3.0.0
+  * version 3.0.0
  *  eliminate the blocking effect of the Alarm-status
  * version 2.3.0
  * 	replace runTimeLimit with dedicated variables UpTimeLimit and DownTimeLimit
@@ -130,8 +130,8 @@
     const byte nightLED = 11;
     const byte manualModeLED = 12;
     const byte alarmLED = 13;
-  // use a output-pin to set nightTime (for test purposes) // TEST_WITHOUT_CLOCK
-  //  const byte nightTimePin = 5; // TEST_WITHOUT_CLOCK
+  // use a output-pin to set nightTime (for test purposes) // FOR TEST_WITHOUT_CLOCK
+  //  const byte nightTimePin = 5; // FOR TEST_WITHOUT_CLOCK
 
 // Arrays with the sunRise and sunSet ephemerides for each month
 // Calculations for Belgium-Bellegem latitude 50,50° / longitude 3,16°  Timezone GMT +1  (no daylight saving time)
@@ -170,7 +170,8 @@ void setup()
   digitalWrite(nightLED,LOW);
   pinMode(alarmLED, OUTPUT);
   digitalWrite(alarmLED,LOW);
-  //pinMode(nightTimePin, INPUT_PULLUP); // TEST_WITHOUT_CLOCK
+  // pinMode(nightTimePin, INPUT_PULLUP); // FOR TEST_WITHOUT_CLOCK
+  // the nightTimePin can emulate the state of nightTime: HIGH=daytime, LOW=nighttime
 
   // Set the Bounce2 connection parameters
     // IF YOUR INPUT HAS AN INTERNAL PULL-UP
@@ -236,7 +237,7 @@ void loop()
 
 // Reset Alarm to 'false' when nightTime has changed
   nightTimeHasChanged = nightTime;
-  // nightTime = digitalRead(nightTimePin); // TEST_WITHOUT_CLOCK
+  // nightTime = digitalRead(nightTimePin); // FOR TEST_WITHOUT_CLOCK
   if(nightTime != nightTimeHasChanged){
     Alarm = false;
     // Serial.print("nightTimeHasChanged =  ");
@@ -275,12 +276,15 @@ void loop()
 
   if(button.pressed()) {
 
+    // if the button is pressed AND both upperSwitch AND lowerSwitch are activated, then:
+    // buttonPressedFlag is cleared and the program continues in automatic modus
     if((digitalRead(upperSwitch) == SWITCH_IS_ACTIVATED) && (digitalRead(lowerSwitch) == SWITCH_IS_ACTIVATED)){
-      // (manually) activate both upperSwitch AND lowerSwitch to clear the buttonPressedFlag
+      // if both upperSwitch AND lowerSwitch are activated, then:
+      // reset buttonPressedFlag
       buttonPressedFlag = false;
-      Alarm = false;   
-      // set 'alarmLed = LOW' to indicate that the pressedButtonFlag is cleared
-      digitalWrite(alarmLED, LOW);
+      // reset Alarmflag 
+      Alarm = false;
+      // set 'alarmLed = LOW' to indicate that the buttonPressedFlag annd the Alarmflag are cleared
       // set 'manualModeLED = LOW  to indicate that we are in automatic modus modus
       digitalWrite(manualModeLED, LOW); 
    
@@ -289,22 +293,29 @@ void loop()
       runMotor1Stop();
     }
 
+    // else if the door is fully open
     else if(digitalRead(upperSwitch) == SWITCH_IS_ACTIVATED){
-      // upperSwitch is activated: close the door
-      buttonPressedFlag = true;
+
       // set 'manualModeLED = HIGH' to indicate that the pressedButtonFlag is set and we are in manual modus
+      buttonPressedFlag = true;
+
       digitalWrite(manualModeLED, HIGH);
-      // Serial.print("1) buttonPressedFlag = "); // TEST_PRINT
-      // Serial.println(buttonPressedFlag); // TEST_PRINT 
+       // Serial.print("button.pressed() 2) buttonPressedFlag = "); // TEST_PRINT
+       // Serial.println(buttonPressedFlag); // TEST_PRINT 
 
       // reset the runTimeCounter
       runTimeCounter = DownTimeLimit;
+
+      // upperSwitch is activated: close the door
       runMotor1Down();
     }
 
     else{
       // only the lowerSwitch is activated OR none of the door switches are activated: open the door
+
+      // set 'manualModeLED = HIGH' to indicate that the pressedButtonFlag is set and we are in manual modus
       buttonPressedFlag = true;
+
       // set 'manualModeLED = HIGH' to indicate that the pressedButtonFlag is set and we are in manual modus
       digitalWrite(manualModeLED, HIGH);
         // Serial.print("3) buttonPressedFlag = "); // TEST_PRINT
@@ -312,6 +323,7 @@ void loop()
 
       // reset the runTimeCounter
       runTimeCounter = UpTimeLimit;
+      // only the lowerSwitch is activated OR none of the door switches are activated: open the door
       runMotor1Up();
     }
 
@@ -334,8 +346,8 @@ void loop()
       runTimeCounter = UpTimeLimit; // reset the runTimeCounter
       runMotor1Up(); // call function runMotor1Up()
 
-      // // Serial.print("runMotor1Up running :"); // TEST_PRINT
-      // // Serial.println(upperSwitchState); // TEST_PRINT
+      // Serial.print("runMotor1Up running :"); // TEST_PRINT
+      // Serial.println(upperSwitchState); // TEST_PRINT
 
     } 
 
