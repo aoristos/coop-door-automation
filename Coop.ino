@@ -1,5 +1,5 @@
  /*
- * Open and close a chicken cooop door, using an Arduino Uno, a MotorShield-L298N and a Real Time Clock DS1307RTC
+ * Open and close a chicken coop door, using an Arduino Uno, a MotorShield-L298N and a Real Time Clock DS1307RTC
 
  * version 3.0.0
  *      eliminate the blocking effect of the Alarm-status
@@ -68,16 +68,16 @@
     const bool SWITCH_NOT_ACTIVATED = LOW;  //= NormalOpen switch
   
   // ATTENTION: 
-    // limit the runtime to protect damage when a switch is never activated
+    // limit the runtime to avoid keeping the motor running and protect against material damage when a switch is never activated
     // runtime depends on the motorspeed, the diameter of the spool and the door elevation height.
-    const byte DownTimeLimit = 220; // Security runtime limit for door closing cyle.
+    const byte DownTimeLimit = 220; // Security runtime limit for door closing cycle (appropriate for my situation).
   
   // ATTENTION: 
     // increase the runTimeCounter with a extra buffer time
   // only apply this incremented runTimeCounter when lifting the door (runMotor1Up())
     // obstruction during the door closing will exceed the runTimeCounter, trigger the Alarm flag and may cause slack in the suspension rope. So the door lifting may once again exceed the runTimeLimit, trigger the Alarm and never activate the upperSwitch. Therefore the UptimeLimit should be a little bit higher than the DownTimeLimit.
 
-    const byte UpTimeLimit = 230; // Security runTime limit for door opening cyle.
+    const byte UpTimeLimit = 230; // Security runTime limit for door opening cycle.
     int runTimeCounter;
 
 // flags to indicate the state of the switches
