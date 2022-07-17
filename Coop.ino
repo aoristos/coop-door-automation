@@ -11,26 +11,26 @@
  * 
  */
 
-// ATTENTION: adjust appropriate offset parameters:
+// ATTENTION-ADJUST: adjust appropriate offset parameters:
 
-  // ATTENTION:
+  // ATTENTION-ADJUST:
   // subtract 1 hour (tm.Hour - summerTimeOffset) when the DS1307RTC is running in summertime modus (daylight saving time values)(zomertijd)
   // because the sunRise[] and sunSet[] ephemerides are expressed all in wintertime
     byte summerTimeOffset = 1; // when the clock-time is running in summer-time
     // byte summerTimeOffset = 0; // when the clock-time is running in winter-time
 
-  // ATTENTION: 
+  // ATTENTION-ADJUST: 
   // make sure you leave enough time for the chickens to go to bed
   // increase sunSetNow with a safety offset time (e.g. 60 minutes)
     byte sunSetOffset = 60;
-  // ATTENTION: 
+  // ATTENTION-ADJUST: 
   // do not wake up the chickens too early
   //increase sunRiseNow with a safety offset time (e.g. 30 minutes)
     byte sunRiseOffset = 30;
   
   // set the values for SWITCH_IS_ACTIVATED and SWITCH_NOT_ACTIVATED
   // the HIGH or LOW status depends on the switch type (NORMAL_OPEN or NORMAL_CLOSE), the wiring and the configuration of the switch INPUT PINS
-  // ATTENTION:
+  // ATTENTION-ADJUST:
   // uncomment the desired values here:
 
     //const bool SWITCH_IS_ACTIVATED = LOW; //= NormalClosed switch
@@ -39,12 +39,12 @@
     //const bool SWITCH_NOT_ACTIVATED = HIGH;  //= NormalClosed switch
     const bool SWITCH_NOT_ACTIVATED = LOW;  //= NormalOpen switch
   
-  // ATTENTION: 
-    // limit the runtime to avoid keeping the motor running and protect against material damage when a switch is never activated
+  // ATTENTION-ADJUST: 
+    // limit the runtime to avoid keeping the motor running forever when a switch is never activated (e.g. due to a blocked door or a detached rope ...)
     // runtime depends on the motorspeed, the diameter of the spool and the door elevation height.
-    const byte DownTimeLimit = 220; // Security runtime limit for door closing cycle (appropriate for my situation).
+    const byte DownTimeLimit = 220; // Security runtime limit for door closing cycle (appropriated for my situation).
   
-  // ATTENTION: 
+  // ATTENTION-ADJUST: 
     // increase the runTimeCounter with a extra buffer time
   // only apply this incremented runTimeCounter when lifting the door (runMotor1Up())
     // obstruction during the door closing will exceed the runTimeCounter, trigger the Alarm flag and may cause slack in the suspension rope. So the door lifting may once again exceed the runTimeLimit, trigger the Alarm and never activate the upperSwitch. Therefore the UptimeLimit should be a little bit higher than the DownTimeLimit.
