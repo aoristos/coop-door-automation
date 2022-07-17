@@ -16,7 +16,7 @@ Hardware:
 * 
 After our chickens were killed a second time by a fox, I decided to install a diy Arduino-controlled-motorized trap door.
 The main function of the program is to close the chicken coop door at sunset and to open it at sunrise.
-The Arduino controller uses a real-time-clock and an array of sunrise/sunset ephemerides to open/close the door at the right time.
+The Arduino controller uses a real-time-clock and an array with sunrise/sunset ephemerides to open/close the door at the right time.
 You can use the NOAA_Solar_Calculations_year to calculate the appropriate values for your geographic location ( https://gml.noaa.gov/grad/solcalc/calcdetails.html )
 
  
