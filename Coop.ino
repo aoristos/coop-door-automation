@@ -1,7 +1,7 @@
  /*
  * Open and close a chicken coop door, using an Arduino Uno, a MotorShield-L298N and a Real Time Clock DS1307RTC
  *
- * v2.2.3
+ * v3.0.0
  *
  * included libraries:
  *  <wire.h> the built-in library to communicate with the I2C bus
@@ -93,8 +93,8 @@
 
 // Arduino pin configuration  
   // Arduino pins for motor 1 
-    const byte IN1 = 8; // MOTOR1 UP
-    const byte IN2 = 9; // MOTOR1 DOWN
+    const byte motor1UP = 8; // MOTOR1 UP
+    const byte motor1DOWN = 9; // MOTOR1 DOWN
   //Arduino pins for the switches
     const byte upperSwitch = 7;
     const byte lowerSwitch = 6;
@@ -132,10 +132,10 @@ void setup()
   Serial.begin(9600);
   
 // initialize pinmodes
-  pinMode(IN1, OUTPUT);
-  digitalWrite(IN1,LOW);
-  pinMode(IN2, OUTPUT);
-  digitalWrite(IN2,LOW);
+  pinMode(motor1UP, OUTPUT);
+  digitalWrite(motor1UP,LOW);
+  pinMode(motor1DOWN, OUTPUT);
+  digitalWrite(motor1DOWN,LOW);
   pinMode(upperSwitch, INPUT_PULLUP);
   pinMode(lowerSwitch, INPUT_PULLUP);
   pinMode(manualModeLED, OUTPUT);
@@ -397,8 +397,8 @@ void runMotor1Up() {
 
   // runMotor1Up as long as the upperSwitch is not activated
   while((digitalRead(upperSwitch) == SWITCH_NOT_ACTIVATED) && Alarm == false) {
-    digitalWrite(IN1, HIGH);
-    digitalWrite(IN2, LOW);
+    digitalWrite(motor1UP, HIGH);
+    digitalWrite(motor1DOWN, LOW);
 
     // Security
     runTimeCounter --;
@@ -427,8 +427,8 @@ void runMotor1Down() {
 
   // runMotor1Down as long as the lowerSwitch is not activated
   while((digitalRead(lowerSwitch) == SWITCH_NOT_ACTIVATED) && Alarm == false) {
-    digitalWrite(IN1, LOW);
-    digitalWrite(IN2, HIGH);
+    digitalWrite(motor1UP, LOW);
+    digitalWrite(motor1DOWN, HIGH);
 
     // Security
     runTimeCounter --;
@@ -455,8 +455,8 @@ void runMotor1Stop() {
   // Serial.println("Dit is de functie void runMotor1Stop()"); // TEST_PRINT
   // delay(3000); // TEST_PRINT
   
-  digitalWrite(IN1, LOW);
-  digitalWrite(IN2, LOW);
+  digitalWrite(motor1UP, LOW);
+  digitalWrite(motor1DOWN, LOW);
 
 }
 
