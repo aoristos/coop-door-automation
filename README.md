@@ -28,29 +28,29 @@ Some variables need to be adjusted once before the sketch is uploaded to the Ard
 They are indicated with // ATTENTION-ADJUST in the code:
 
 * summerTimeOffset
-	The ephemerides in the array are expressed according UTC (Greenwich Meantime)(no Daylight Saving Time).
-	Subtract1 hour from the time reading (tm.Hour) in case the DS1307 RTC time was initialized in Daylight Saving Time (Summer Time) 
+   The ephemerides in the array are expressed according UTC (Greenwich Meantime)(no Daylight Saving Time).
+   Subtract1 hour from the time reading (tm.Hour) in case the DS1307 RTC time was initialized in Daylight Saving Time (Summer Time) 
 
 * sunSetOffset
-	 make sure you leave enough time for the chickens to go to bed
-	increase sunSetNow with a safety offset time (e.g. 60 minutes)
+   make sure you leave enough time for the chickens to go to bed
+   increase sunSetNow with a safety offset time (e.g. 60 minutes)
 
 * sunRiseOffset
-	do not wake up the chickens too early
-	increase sunRiseNow with a safety offset time (e.g. 30 minutes)
+   do not wake up the chickens too early
+   increase sunRiseNow with a safety offset time (e.g. 30 minutes)
 
 * SWITCH_IS_ACTIVATED /  SWITCH_NOT_ACTIVATED
-	the HIGH or LOW status depends on the switch type (NORMAL_OPEN or NORMAL_CLOSE) and on the wiring and the configuration of the switch INPUT PINS
-	uncomment the desired code line.
+   the HIGH or LOW status depends on the switch type (NORMAL_OPEN or NORMAL_CLOSE) and on the wiring and the configuration of the switch INPUT PINS
+   uncomment the desired code line.
 
 * DownTimeLimit
-	limit the runtime to avoid keeping the motor running forever when a switch is never activated (e.g. due to a blocked door or a detached rope ...)
-	runtime depends on the motorspeed, the diameter of the spool and the door elevation height.
-	Set a security runtime limit for door closing cycle (appropriated for your situation).
+   limit the runtime to avoid keeping the motor running forever when a switch is never activated (e.g. due to a blocked door or a detached rope ...)
+   runtime depends on the motorspeed, the diameter of the spool and the door elevation height.
+   Set a security runtime limit for door closing cycle (appropriated for your situation).
 
 * UpTimeLimit
-	Sometimes an obstruction during the door closing event may may cause some slack in the suspension rope.
-	Therefore the UptimeLimit should be a little bit higher than the DownTimeLimit.
+   Sometimes an obstruction during the door closing event may may cause some slack in the suspension rope.
+   Therefore the UptimeLimit should be a little bit higher than the DownTimeLimit.
 
  
  
