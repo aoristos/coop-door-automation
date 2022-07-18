@@ -49,8 +49,7 @@ They are indicated with // ATTENTION-ADJUST in the code:
 	Set a security runtime limit for door closing cycle (appropriated for your situation).
 
 * UpTimeLimit
-	obstruction during the door closing will exceed the runTimeCounter, trigger the Alarm flag and may cause slack in the suspension rope.
-	So the door lifting may once again exceed the runTimeLimit, trigger the Alarm and never activate the upperSwitch.
+	Sometimes an obstruction during the door closing event may may cause some slack in the suspension rope.
 	Therefore the UptimeLimit should be a little bit higher than the DownTimeLimit.
 
  
