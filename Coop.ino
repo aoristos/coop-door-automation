@@ -1,9 +1,14 @@
  /*
- * Open and close a chicken coop door, using an Arduino Uno, a MotorShield-L298N and a Real Time Clock DS1307RTC
- *
- * v3.0.0
- *
- * included libraries:
+ * Open and close a chicken cooop door, using an Arduino Uno, a MotorShield-L298N and a Real Time Clock DS1307RTC
+ * 
+ * version 2.3.0
+ *  * 
+ * Hardware:
+ *  Arduino Uno
+ *  MotorShield-L298N
+ *  DS1307 Tiny RTC
+ *  
+ * include libraries:
  *  <wire.h> the built-in library to communicate with the I2C bus
  *  <TimeLib.h> library ( https://github.com/PaulStoffregen/Time/releases )
  *  <DS1307RTC.h> library ( https://github.com/PaulStoffregen/DS1307RTC/releases )
@@ -261,7 +266,6 @@ void loop()
     else{
       // only the lowerSwitch is activated OR none of the door switches are activated: open the door
 
-      // set 'manualModeLED = HIGH' to indicate that the pressedButtonFlag is set and we are in manual modus
       buttonPressedFlag = true;
 
       // set 'manualModeLED = HIGH' to indicate that the pressedButtonFlag is set and we are in manual modus
@@ -274,7 +278,7 @@ void loop()
     }
 
   }
-
+  // Check the switches
   // read the state of the upperSwitch and place it in the variable upperSwitchState
     upperSwitchState = digitalRead(upperSwitch);
   // read the state of the lowerSwitch and place it in the variable lowerSwitchState
