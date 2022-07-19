@@ -226,7 +226,7 @@ void loop()
   // Serial.println(digitalRead(pressDownButton)); // TEST_PRINT
 
   // <Button>.pressed() returns true if the state has changed and the current state matches <Button>.setPressedState(<HIGH or LOW>);
-  // (which is low in this example  s set with <button.setPressedState(LOW)>; IN setup()
+  // (which is low in this example as set with <button.setPressedState(LOW)>; IN setup()
 
   if(button.pressed()) {
 
