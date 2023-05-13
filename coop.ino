@@ -59,7 +59,6 @@
 	// runtime depends on the motorspeed, the diameter of the spool and the door elevation height.
 // ATTENTION-ADJUST: 
 		const byte DownTimeLimit = 210; // Security runtime limit for door closing cycle (appropriated for my situation).
-		// if ((UpTimeLimit = 210) && (stepDelay = 25) then motor runtime = 5,50 seconds
   
 // Security:
   // Any obstruction during the door closing may avoid activation of the lowerSwitch. 
@@ -71,7 +70,8 @@
 
 // motorspeed security timecounter step delay regulator 
 // Use a step-delay time regulation (in miliseconds) between each couter step
-   const byte stepDelay = 35;
+// (this value is appropriated for my coop door closing cycle)
+   const byte stepDelay = 30;
 
 // store today's sunrise and sunset 'minutes after midnight'
 	//int sunRiseNow;
