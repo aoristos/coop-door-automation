@@ -1,0 +1,14 @@
+token
+.git
+*.7z
+*.dia*
+*.pdf
+*.mm
+*.png
+*.bak
+*.drawio*
+*.vy*
+*.lock
+*.minder
+*.xxx
+*.code-workspace
