@@ -434,6 +434,21 @@ void loop()
 // this function uses the type 'tmElements_t' object 'tm' from the 'DS1307RTC.h' library
 bool checkNightTime(tmElements_t tm) {
 
+
+/* TEMP INFO
+// test finetuning sunRiseNow & sunSetNow
+// attention: if sun_rise(thisMonth)=11 then sun_rise(nextMonth)=1
+// sunRiseNow = sunRiseNow - ((sunRise(thisMonth) - sunRise(nextMonth)) / 30 ) * day-datenumber
+// e.g sunRiseNow for 10 januari
+// sunRiseNow = 526 - ((526 - 491) / 30) * 10
+//
+//  int sun_rise[12]={ 
+//  //Jan   Feb   Mar   Apr   May   Jun   Jul   Aug   Sep   Oct   Nov   Dec
+//  526, 491, 436, 368, 310, 277, 286, 325, 372, 419, 470, 515};
+// 08:46, 08:11, 07:16, 06:08, 05:09, 04:36, 04:45, 05:25, 06:12, 06:58, 07:50, 08:34     - Times are GMT+1 ; no Daylight Saving Time (no summer time)
+*/
+
+
   // ! (tm.Month-1) because the first element of an array is at index 0 (the array positions count from [0] to [11])
   int sunRiseNow = sun_rise[(tm.Month -1)] + sunRiseOffset;  // Find the appropriate time in the array sun_rise[] and add a safety offset time (e.g. 30 minutes) to avoid a premature wake up.
   int sunSetNow = sun_set [(tm.Month -1)] + sunSetOffset;  // Find the appropriate time in the array sun_set[] and add a safety offset time (e.g. 60 minutes) to avoid "locked-out" chickens.
