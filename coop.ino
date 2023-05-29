@@ -1,7 +1,7 @@
  /*
  * Open and close a chicken coop door, using an Arduino Uno, a MotorShield-L298N and a Real Time Clock DS1307RTC
  *
- * Version = 1.2.0
+ * Version = 1.2.1.alfa
  *
  * Hardware:
  *  Arduino Uno
