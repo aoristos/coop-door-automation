@@ -437,8 +437,9 @@ bool checkNightTime(tmElements_t tm) {
 
 /* TEMP INFO
 // test finetuning sunRiseNow & sunSetNow
-// attention: if sun_rise(thisMonth)=11 then sun_rise(nextMonth)=1
-// sunRiseNow = sunRiseNow - ((sunRise(thisMonth) - sunRise(nextMonth)) / 30 ) * day-datenumber
+// nextMonth=(thisMonth + 1)
+// attention: if 'thisMonth'=12 then nextMonth=1
+// sunRiseNow = sunRiseNow - ((sunRise(thisMonth) - sunRise(nextMonth)) / 30 ) * date-daynumber
 // e.g sunRiseNow for 10 januari
 // sunRiseNow = 526 - ((526 - 491) / 30) * 10
 //
@@ -448,23 +449,31 @@ bool checkNightTime(tmElements_t tm) {
 // 08:46, 08:11, 07:16, 06:08, 05:09, 04:36, 04:45, 05:25, 06:12, 06:58, 07:50, 08:34     - Times are GMT+1 ; no Daylight Saving Time (no summer time)
 */
 
+  byte Today = tm.Day
 
+  byte thisMonth = tm.Month
+  byte nextMonth = thisMonth + 1
+  if (thisMonth >= 12) {
+      nextMonth = 1
+    }
   // ! (tm.Month-1) because the first element of an array is at index 0 (the array positions count from [0] to [11])
-  int sunRiseNow = sun_rise[(tm.Month -1)] + sunRiseOffset;  // Find the appropriate time in the array sun_rise[] and add a safety offset time (e.g. 30 minutes) to avoid a premature wake up.
-  int sunSetNow = sun_set [(tm.Month -1)] + sunSetOffset;  // Find the appropriate time in the array sun_set[] and add a safety offset time (e.g. 60 minutes) to avoid "locked-out" chickens.
-  int clockTimeNow = (tm.Hour-summerTimeOffset) * 60 + tm.Minute; // clockTimeNow in minutes: substract 1 Hour (summerTimeOffset) when the clock runs in summertime 
+  // sunRiseNow = sunRiseNow - ((sunRise(thisMonth) - sunRise(nextMonth)) / 30 ) * Today
+  int sunRiseNow = (sun_rise[(thisMonth -1)] - (((sunRise(thisMonth) - sunRise(nextMonth)) / 30) * Today)) + sunRiseOffset
+  //(old algorithm) int sunRiseNow = sun_rise[(monthNumber -1)] + sunRiseOffset;  // Find the appropriate time in the array sun_rise[] and add a safety offset time (e.g. 30 minutes) to avoid a premature wake up.
+  int sunSetNow = (sun_set[(thisMonth -1)] - (((sunSet(thisMonth) - sunSet(nextMonth)) / 30) * Today)) + sunSetOffset
+  //(old algorithm²) int sunSetNow = sun_set[(monthNumber -1)] + sunSetOffset;  // Find the appropriate time in the array sun_set[] and add a safety offset time (e.g. 60 minutes) to avoid "locked-out" chickens.
+
+  int clockTimeNow = (tm.Hour-summerTimeOffset) * 60 + tm.Minute; // clockTimeNow in minutes: substract 1 Hour (summerTimeOffset=1) when the clock runs in summertime 
 
 	// Serial.println("510.00 Dit is de functie checkNightTime"); // TEST_PRINT
 
-  /*
-    Serial.print("sunRiseNow is "); // TEST_PRINT 
+    Serial.print("510.10 sunRiseNow is "); // TEST_PRINT 
     Serial.print(sunRiseNow); // TEST_PRINT
     Serial.print("       sunSetNow is "); // TEST_PRINT   
     Serial.print(sunSetNow); // TEST_PRINT
     Serial.print("       clockTimeNow is "); // TEST_PRINT  
     Serial.println(clockTimeNow); // TEST_PRINT
-  */
-  
+ 
   bool nightTime = true; // it is nighttime except if the clocktime is between sunrise and sunset
   if ((clockTimeNow >= sunRiseNow) && (clockTimeNow <= sunSetNow)) {
     nightTime = false; // it is daytime if the clocktime is between sunrise and sunset
