@@ -433,12 +433,10 @@ void loop()
 // this function uses the type 'tmElements_t' object 'tm' from the 'DS1307RTC.h' library
 bool checkNightTime(tmElements_t tm) {
 
-
 // finetuning sunRiseNow & sunSetNow per day
 // int sunRiseNow = sun_rise[thisMonth] - ((sun_rise[thisMonth] - sun_rise[nextMonth]) * Today / 30) + sunRiseOffset;
 // e.g sunRiseNow for 18 januari
 // sunRiseNow = 526 - ((526 - 491) * 18 / 30) + 0
-*/
 
   byte Today = tm.Day;
 
