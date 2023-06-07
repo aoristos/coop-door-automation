@@ -1,7 +1,7 @@
  /*
  * Open and close a chicken coop door, using an Arduino Uno, a MotorShield-L298N and a Real Time Clock DS1307RTC
  *
- * Version = 1.2.1.alfa
+ * Version = 1.2.1
  *
  * Hardware:
  *  Arduino Uno
@@ -183,10 +183,9 @@ void loop()
   // delay(10000); // TEST_PRINT
 
   // Print the version number
-  Serial.print("version = 1.2.0");
+  Serial.print("version = 1.2.1");
 	Serial.println(" - summertime");
-  Serial.println(); 
-  
+ 
   tmElements_t tm;
 
   if (RTC.read(tm)) {
@@ -435,45 +434,41 @@ void loop()
 bool checkNightTime(tmElements_t tm) {
 
 
-/* TEMP INFO
-// test finetuning sunRiseNow & sunSetNow
-// nextMonth=(thisMonth + 1)
-// attention: if 'thisMonth'=12 then nextMonth=1
-// sunRiseNow = sunRiseNow - ((sunRise(thisMonth) - sunRise(nextMonth)) / 30 ) * date-daynumber
-// e.g sunRiseNow for 10 januari
-// sunRiseNow = 526 - ((526 - 491) / 30) * 10
-//
-//  int sun_rise[12]={ 
-//  //Jan   Feb   Mar   Apr   May   Jun   Jul   Aug   Sep   Oct   Nov   Dec
-//  526, 491, 436, 368, 310, 277, 286, 325, 372, 419, 470, 515};
-// 08:46, 08:11, 07:16, 06:08, 05:09, 04:36, 04:45, 05:25, 06:12, 06:58, 07:50, 08:34     - Times are GMT+1 ; no Daylight Saving Time (no summer time)
+// finetuning sunRiseNow & sunSetNow per day
+// int sunRiseNow = sun_rise[thisMonth] - ((sun_rise[thisMonth] - sun_rise[nextMonth]) * Today / 30) + sunRiseOffset;
+// e.g sunRiseNow for 18 januari
+// sunRiseNow = 526 - ((526 - 491) * 18 / 30) + 0
 */
 
-  byte Today = tm.Day
+  byte Today = tm.Day;
 
-  byte thisMonth = tm.Month
-  byte nextMonth = thisMonth + 1
-  if (thisMonth >= 12) {
-      nextMonth = 1
+  byte thisMonth = (tm.Month - 1);
+  byte nextMonth = tm.Month;
+  if (thisMonth == 11) {
+      nextMonth = 0;
     }
-  // ! (tm.Month-1) because the first element of an array is at index 0 (the array positions count from [0] to [11])
-  // sunRiseNow = sunRiseNow - ((sunRise(thisMonth) - sunRise(nextMonth)) / 30 ) * Today
-  int sunRiseNow = (sun_rise[(thisMonth -1)] - (((sunRise(thisMonth) - sunRise(nextMonth)) / 30) * Today)) + sunRiseOffset
+  // ! thisMonth=(tm.Month-1) because the first element of an array is at index 0 (the array positions count from [0] to [11])
+  int sunRiseNow = sun_rise[thisMonth] - ((sun_rise[thisMonth] - sun_rise[nextMonth]) * Today / 30) + sunRiseOffset;
   //(old algorithm) int sunRiseNow = sun_rise[(monthNumber -1)] + sunRiseOffset;  // Find the appropriate time in the array sun_rise[] and add a safety offset time (e.g. 30 minutes) to avoid a premature wake up.
-  int sunSetNow = (sun_set[(thisMonth -1)] - (((sunSet(thisMonth) - sunSet(nextMonth)) / 30) * Today)) + sunSetOffset
-  //(old algorithm²) int sunSetNow = sun_set[(monthNumber -1)] + sunSetOffset;  // Find the appropriate time in the array sun_set[] and add a safety offset time (e.g. 60 minutes) to avoid "locked-out" chickens.
+  int sunSetNow = sun_set[thisMonth] - ((sun_set[thisMonth] - sun_set[nextMonth]) * Today / 30) + sunSetOffset;
+  //(old algorithm) int sunSetNow = sun_set[(monthNumber -1)] + sunSetOffset;  // Find the appropriate time in the array sun_set[] and add a safety offset time (e.g. 60 minutes) to avoid "locked-out" chickens.
 
   int clockTimeNow = (tm.Hour-summerTimeOffset) * 60 + tm.Minute; // clockTimeNow in minutes: substract 1 Hour (summerTimeOffset=1) when the clock runs in summertime 
 
 	// Serial.println("510.00 Dit is de functie checkNightTime"); // TEST_PRINT
+/*
+  Serial.print("510.10 sunRiseNow finetuning is "); // TEST_PRINT 
+  Serial.println((sun_rise[thisMonth] - sun_rise[nextMonth]) * Today / 30); // TEST_PRINT
+  Serial.print("510.10 sunSetNow finetuning is "); // TEST_PRINT 
+  Serial.println((sun_set[thisMonth] - sun_set[nextMonth]) * Today / 30); // TEST_PRINT
+  Serial.print("510.10 sunRiseNow is "); // TEST_PRINT 
+  Serial.print(sunRiseNow); // TEST_PRINT
+  Serial.print("       sunSetNow is "); // TEST_PRINT   
+  Serial.print(sunSetNow); // TEST_PRINT
+  Serial.print("       clockTimeNow is "); // TEST_PRINT  
+  Serial.println(clockTimeNow); // TEST_PRINT
+ */
 
-    Serial.print("510.10 sunRiseNow is "); // TEST_PRINT 
-    Serial.print(sunRiseNow); // TEST_PRINT
-    Serial.print("       sunSetNow is "); // TEST_PRINT   
-    Serial.print(sunSetNow); // TEST_PRINT
-    Serial.print("       clockTimeNow is "); // TEST_PRINT  
-    Serial.println(clockTimeNow); // TEST_PRINT
- 
   bool nightTime = true; // it is nighttime except if the clocktime is between sunrise and sunset
   if ((clockTimeNow >= sunRiseNow) && (clockTimeNow <= sunSetNow)) {
     nightTime = false; // it is daytime if the clocktime is between sunrise and sunset
