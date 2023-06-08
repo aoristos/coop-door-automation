@@ -71,7 +71,7 @@
 // motorspeed security timecounter step delay regulator 
 // Use a step-delay time regulation (in miliseconds) between each couter step
 // (this value is appropriated for my coop door closing cycle)
-   const byte stepDelay = 30;
+   const byte stepDelay = 25;
 
 // store today's sunrise and sunset 'minutes after midnight'
 	//int sunRiseNow;
