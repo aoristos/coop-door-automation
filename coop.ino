@@ -183,8 +183,8 @@ void loop()
   // delay(10000); // TEST_PRINT
 
   // Print the version number
-  Serial.print("version = 1.2.1");
-	Serial.println(" - summertime");
+  //Serial.print("version = 1.2.1");
+	//Serial.println(" - summertime");
  
   tmElements_t tm;
 
@@ -194,8 +194,9 @@ void loop()
   	// delay(10000); // TEST_PRINT
  
     // Read the DS1307 RTC and print to the serial monitor
-    // Serial.print("02.10.11 Ok, Time = "); // TEST_PRINT
-    //Serial.print(", Date (D/M/Y) = "); // TEST_PRINT
+  /*
+    Serial.print("02.10.11 Ok, Time = "); // TEST_PRINT
+    Serial.print(", Date (D/M/Y) = "); // TEST_PRINT
     Serial.print(tm.Day); // TEST_PRINT
     Serial.write('/'); // TEST_PRINT
     Serial.print(tm.Month); // TEST_PRINT
@@ -207,6 +208,7 @@ void loop()
     //Serial.write(':'); // TEST_PRINT
     //print2digits(tm.Second); // TEST_PRINT
     Serial.println(); // TEST_PRINT
+  */
 
     // prepare Reset Alarm
     oldNightTime = nightTime;
