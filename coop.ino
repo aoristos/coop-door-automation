@@ -346,6 +346,9 @@ void loop()
       // upperSwitch is activated: close the door
       runMotor1Down(DownTimeLimit);
 
+      Alarm = true;
+      digitalWrite(alarmLED, HIGH);
+
 			// Serial.println("02.40.11.11 status after runMotor1Down"); // TEST_PRINT
 			// delay(10000); // TEST_PRINT
 
@@ -360,6 +363,9 @@ void loop()
 
       // only the lowerSwitch is activated OR none of the door switches are activated: open the door
 	    runMotor1Up(UpTimeLimit);
+
+      Alarm = true;
+      digitalWrite(alarmLED, HIGH);
 
 			// Serial.println("02.40.11.12 status after runMotor1Up"); // TEST_PRINT
   		// delay(10000); // TEST_PRINT
