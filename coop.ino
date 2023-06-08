@@ -86,7 +86,7 @@
 	bool oldNightTime;
 
 	// set flag to indicate when the button is pressed
-	// set buttonPressedFlag== true when Button.pressed()== true;
+	// set buttonPressedFlag = true when Button.pressed()== true;
 	bool buttonPressedFlag;
 
 // include libraries
@@ -332,9 +332,9 @@ void loop()
 	 }
 
 
-	if ((buttonPressedFlag == true) && (Alarm == false)) {
+	if (buttonPressedFlag == true) {
 
-		 // Serial.println("02.40.11 (buttonPressedFlag == 'true' && Alarm == 'false')"); // TEST_PRINT
+		 // Serial.println("02.40.11 (buttonPressedFlag == 'true' )"); // TEST_PRINT
 		 // delay(10000); // TEST_PRINT
 
     // if the door is fully open
@@ -510,6 +510,8 @@ void runMotor1Up(byte runTimeCounter) {
     if (runTimeCounter <= 0) {
       Alarm = true;
       digitalWrite(alarmLED, HIGH);
+      // run motor1Stop() as soon as the runTimeCounter is zero or below
+      runMotor1Stop();
     }
     
 		// Serial.print("Alarm = "); // TEST_PRINT
@@ -546,6 +548,8 @@ void runMotor1Down(byte runTimeCounter) {
     if (runTimeCounter <= 0) {
       Alarm = true;
       digitalWrite(alarmLED, HIGH);
+      // run motor1Stop() as soon as the runTimeCounter is zero or below
+      runMotor1Stop();
     }
     
 		// Serial.print("Alarm = "); // TEST_PRINT
