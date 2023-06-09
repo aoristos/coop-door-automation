@@ -1,7 +1,7 @@
- /*
+/*
  * Open and close a chicken coop door, using an Arduino Uno, a MotorShield-L298N and a Real Time Clock DS1307RTC
  *
- * Version = 1.2.1
+ * Version = 1.2.2
  *
  * Hardware:
  *  Arduino Uno
@@ -136,6 +136,9 @@
   1022, 1072, 1120, 1170, 1218, 1256, 1259, 1221, 1158, 1091, 1032, 1004};
   // 17:01, 17:51, 18:40, 19:30, 20:17, 20:56, 20:59, 20:20, 19:17, 18:11, 17:11, 16:43      - Times are GMT+1 ; no Daylight Saving Time (no summer time)
 
+
+// -----------------------------------------------------------------------------------------------
+
 void setup()
 {
    
@@ -176,6 +179,8 @@ void setup()
 }
 
 
+// -----------------------------------------------------------------------------------------------
+
 void loop()
 { 
 
@@ -183,8 +188,8 @@ void loop()
   // delay(10000); // TEST_PRINT
 
   // Print the version number
-  //Serial.print("version = 1.2.1");
-	//Serial.println(" - summertime");
+  Serial.print("version = 1.2.2");
+  Serial.println(" - summertime");
  
   tmElements_t tm;
 
@@ -194,21 +199,21 @@ void loop()
   	// delay(10000); // TEST_PRINT
  
     // Read the DS1307 RTC and print to the serial monitor
-  /*
-    Serial.print("02.10.11 Ok, Time = "); // TEST_PRINT
-    Serial.print(", Date (D/M/Y) = "); // TEST_PRINT
+ 
+    Serial.print("02.10.11 Date (D/M/Y) = "); // TEST_PRINT
     Serial.print(tm.Day); // TEST_PRINT
     Serial.write('/'); // TEST_PRINT
     Serial.print(tm.Month); // TEST_PRINT
     Serial.write('/'); // TEST_PRINT
     Serial.println(tmYearToCalendar(tm.Year)); // TEST_PRINT
+    Serial.print("02.10.11 Time = "); // TEST_PRINT
     print2digits(tm.Hour); // TEST_PRINT
     Serial.write(':'); // TEST_PRINT
     print2digits(tm.Minute); // TEST_PRINT
     //Serial.write(':'); // TEST_PRINT
     //print2digits(tm.Second); // TEST_PRINT
     Serial.println(); // TEST_PRINT
-  */
+ 
 
     // prepare Reset Alarm
     oldNightTime = nightTime;
@@ -220,27 +225,27 @@ void loop()
 		// It is 'night' when nightTimePin = HIGH. It is 'day' when nightTimePin = LOW // FOR TEST_WITHOUT_CLOCK
     // nightTime = digitalRead(nightTimePin); // FOR TEST_WITHOUT_CLOCK
 
-	  // Serial.print("02.10.11 nightTime is now "); // TEST_PRINT
-	  // Serial.println(nightTime); // TEST_PRINT
+	   Serial.print("02.10.11 nightTime is now "); // TEST_PRINT
+	   Serial.println(nightTime); // TEST_PRINT
 
     // Clear Alarm and buttonPressedFlag when nightTime has changed
 
     if (nightTime != oldNightTime) {
 
-			// Serial.println("02.10.11.11 nightTime has changed !"); // TEST_PRINT
+			Serial.println("02.10.11.11 nightTime has changed !"); // TEST_PRINT
 
       Alarm = false; // Reset Alarm
       digitalWrite(alarmLED, LOW); // Reset alarmLED (= LOW)
 			// Serial.println("02.10.11.11 Alarm = false"); // TEST_PRINT
 			// delay(10000); // TEST_PRINT
 
-			// set buttonPressedFlag = false 
+			// set buttonPressedFlag = false
 			buttonPressedFlag = false; // Reset buttonPressedFlag
 			// Serial.println("02.10.11.11 buttonPressedFlag = 'false'"); // TEST_PRINT
 			// delay(10000); // TEST_PRINT
 
 			// set 'manualModeLED = LOW' to indicate that the buttonPressedFlag is cleared
-			// digitalWrite(manualModeLED, LOW); //Reset manualModeLED
+			digitalWrite(manualModeLED, LOW); //Reset manualModeLED
 			// Serial.println("02.10.11.11 Set manualModeLED = 'LOW'"); // TEST_PRINT
   		// delay(10000); // TEST_PRINT
 
@@ -275,6 +280,7 @@ void loop()
 			// Serial.println();
 		}
 
+//-----------------------------------------
 
 	// Return to automatic mode when both upperSwitch AND lowerSwitch are activated
     if ((digitalRead(upperSwitch) == SWITCH_IS_ACTIVATED) && (digitalRead(lowerSwitch) == SWITCH_IS_ACTIVATED)) {
@@ -284,19 +290,19 @@ void loop()
 
 			// reset buttonPressedFlag
 			buttonPressedFlag = false;
-			// Serial.print("02.50.11 buttonPressedFlag = ')"); // TEST_PRINT
-			// Serial.println(buttonPressedFlag); // TEST_PRINT
-  		// delay(10000); // TEST_PRINT
+			 Serial.print("02.50.11 buttonPressedFlag = "); // TEST_PRINT
+			 Serial.println(buttonPressedFlag); // TEST_PRINT
+  		 // delay(3000); // TEST_PRINT
 
       // set 'manualModeLED = LOW  to indicate that we are in automatic modus modus
 			digitalWrite(manualModeLED, LOW); // reset manualModeLED (= LOW)
-			// Serial.println("02.50.11 Set manualModeLED = 'LOW'"); // TEST_PRINT
-  		// delay(10000); // TEST_PRINT
+			 Serial.println("02.50.11 Set manualModeLED = 'LOW'"); // TEST_PRINT
+  		 // delay(10000); // TEST_PRINT
 
 		  // reset Alarmflag 
       Alarm = false; // Reset Alarm
-			// Serial.println("02.50.11 Alarm = false"); // TEST_PRINT
-  		// delay(10000); // TEST_PRINT
+			 Serial.println("02.50.11 Alarm = false"); // TEST_PRINT
+  		 delay(3000); // TEST_PRINT
 
       // set 'alarmLed = LOW' to indicate that the buttonPressedFlag and the Alarmflag are cleared
       digitalWrite(alarmLED, LOW); // Reset alarmLED (= LOW)
@@ -306,25 +312,28 @@ void loop()
 	}
 
 
+
+//-----------------------------------------
+
 	// Update the Bounce instance (YOU MUST DO THIS EVERY LOOP)
 	button.update();
 
 			// Serial.println("02.30 Update the Bounce instance (YOU MUST DO THIS EVERY LOOP)"); // TEST_PRINT
-	 		// Serial.print("02.30 Alarm = "); // TEST_PRINT
-	 		// Serial.println(Alarm); // TEST_PRINT
+	 		 Serial.print("02.30 Alarm = "); // TEST_PRINT
+	 		 Serial.println(Alarm); // TEST_PRINT
 
 
 	// set buttonPressedFlag each time when the button is pressed. 
 	 if (button.pressed()) {
 
-		// Serial.println("02.30.11 Button is pressed"); // TEST_PRINT
+		 Serial.println("02.30.11 Button is pressed"); // TEST_PRINT
 		// delay(10000); // TEST_PRINT
 	
 		// set buttonPressedFlag = true
 		buttonPressedFlag = true;
 
-		// Serial.println("02.30.11 buttonPressedFlag = 'true'"); // TEST_PRINT
-		// delay(10000); // TEST_PRINT
+		 Serial.println("02.30.11 buttonPressedFlag = 'true'"); // TEST_PRINT
+		 delay(3000); // TEST_PRINT
 
 		// set 'manualModeLED = HIGH' to indicate that the buttonPressedFlag is set and we are in manual modus
 		digitalWrite(manualModeLED, HIGH);
@@ -332,22 +341,25 @@ void loop()
 	 }
 
 
+//-----------------------------------------
+
+
 	if (buttonPressedFlag == true) {
 
-		 // Serial.println("02.40.11 (buttonPressedFlag == 'true' )"); // TEST_PRINT
-		 // delay(10000); // TEST_PRINT
+		  Serial.println("02.40.11 (buttonPressedFlag == 'true'"); // TEST_PRINT
+		  delay(3000); // TEST_PRINT
 
     // if the door is fully open
     if (digitalRead(upperSwitch) == SWITCH_IS_ACTIVATED) {
 
-			// Serial.println("02.40.11.11 upperSwitch is activated: close the door"); // TEST_PRINT
+			 Serial.println("02.40.11.11 upperSwitch is activated: close the door"); // TEST_PRINT
   		// delay(10000); // TEST_PRINT
 
       // upperSwitch is activated: close the door
       runMotor1Down(DownTimeLimit);
 
-      Alarm = true;
-      digitalWrite(alarmLED, HIGH);
+      // Alarm = true;
+      // digitalWrite(alarmLED, HIGH);
 
 			// Serial.println("02.40.11.11 status after runMotor1Down"); // TEST_PRINT
 			// delay(10000); // TEST_PRINT
@@ -358,14 +370,14 @@ void loop()
 		// else if (digitalRead(lowerSwitch) == SWITCH_IS_ACTIVATED ){
 			else {
 
-			// Serial.println("02.40.11.12 the door was closed or halfway: open the door"); // TEST_PRINT
+			 Serial.println("02.40.11.12 the door was closed or halfway: open the door"); // TEST_PRINT
   		// delay(10000); // TEST_PRINT
 
       // only the lowerSwitch is activated OR none of the door switches are activated: open the door
 	    runMotor1Up(UpTimeLimit);
 
-      Alarm = true;
-      digitalWrite(alarmLED, HIGH);
+      // Alarm = true;
+      // digitalWrite(alarmLED, HIGH);
 
 			// Serial.println("02.40.11.12 status after runMotor1Up"); // TEST_PRINT
   		// delay(10000); // TEST_PRINT
@@ -387,7 +399,7 @@ void loop()
     // run Motor1Up if it is daytime AND the upperSwitch is not activated
     if (nightTime == false && digitalRead(upperSwitch) == SWITCH_NOT_ACTIVATED) {
 
-			// Serial.println("02.60.11.11 (nightTime == false AND upperSwitch == SWITCH_NOT_ACTIVATED)"); // TEST_PRINT
+			 Serial.println("02.60.11.11 (nightTime == false AND upperSwitch == SWITCH_NOT_ACTIVATED)"); // TEST_PRINT
   		// delay(10000); // TEST_PRINT
 
       runMotor1Up(UpTimeLimit); // call function runMotor1Up(UpTimeLimit)
@@ -395,12 +407,12 @@ void loop()
 			// Serial.println("02.60.11.11 status after runMotor1Up"); // TEST_PRINT
   		// delay(10000); // TEST_PRINT
 
-    } 
+    }
 
     // else runMotor1Down if it is nightTime AND the lowerSwitch is not activated
     else if (nightTime == true && digitalRead(lowerSwitch) == SWITCH_NOT_ACTIVATED) {
 
-			// Serial.println("02.60.11.12 else if (nightTime == true and lowerSwitch == SWITCH_NOT_ACTIVATED"); // TEST_PRINT
+			 Serial.println("02.60.11.12 else if (nightTime == true and lowerSwitch == SWITCH_NOT_ACTIVATED"); // TEST_PRINT
   		// delay(10000); // TEST_PRINT
 
       runMotor1Down(DownTimeLimit); // call function runMotor1Down(DownTimeLimit)
@@ -413,7 +425,7 @@ void loop()
 
   	// else runMotor1Stop
     else {
-    	// Serial.println("02.60.11.13 runMotorStop(}"); // TEST_PRINT
+    	 Serial.println("02.60.11.13 runMotorStop(}"); // TEST_PRINT
   		// delay(10000); // TEST_PRINT
 
       runMotor1Stop(); // stop the motor
@@ -427,15 +439,17 @@ void loop()
 
 // -----------------------------------------------------------------------------------------------
 
-  // Serial.print("02.60 Alarm = "); // TEST_PRINT
-  // Serial.println(Alarm); // TEST_PRINT
+   // Serial.print("02.60 Alarm = "); // TEST_PRINT
+   // Serial.println(Alarm); // TEST_PRINT
 
 	// dit is het einde van void loop()
-  // Serial.println("02.99 Dit is het einde van void loop()"); // TEST_PRINT 
-	// Serial.println(); // TEST_PRINT
+   Serial.println("02.99 Dit is het einde van void loop()"); // TEST_PRINT 
+	 Serial.println(); // TEST_PRINT
 
 }
 
+
+// -----------------------------------------------------------------------------------------------
 
 // function to check if it's day or night
 // this function uses the type 'tmElements_t' object 'tm' from the 'DS1307RTC.h' library
@@ -474,10 +488,10 @@ bool checkNightTime(tmElements_t tm) {
   Serial.print("       clockTimeNow is "); // TEST_PRINT  
   Serial.println(clockTimeNow); // TEST_PRINT
  */
-
-  bool nightTime = true; // it is nighttime except if the clocktime is between sunrise and sunset
+// it is always nighttime except when the clocktime is between sunrise and sunset
+  bool nightTime = true; // it is always nighttime except when the clocktime is between sunrise and sunset
   if ((clockTimeNow >= sunRiseNow) && (clockTimeNow <= sunSetNow)) {
-    nightTime = false; // it is daytime if the clocktime is between sunrise and sunset
+    nightTime = false; // it is daytime because the clocktime is between sunrise and sunset
   }
 
 		// Serial.print("510.11 nightTime = "); // TEST_PRINT
@@ -487,6 +501,9 @@ bool checkNightTime(tmElements_t tm) {
   return nightTime;
 }
 
+
+
+// -----------------------------------------------------------------------------------------------
 
 // this function activates runMotor1Up
 void runMotor1Up(byte runTimeCounter) {  
@@ -499,8 +516,8 @@ void runMotor1Up(byte runTimeCounter) {
     digitalWrite(motor1UP, HIGH);
     digitalWrite(motor1DOWN, LOW);
 
-    // Serial.print("runTimeCounter = "); // TEST_PRINT
-    // Serial.println(runTimeCounter); // TEST_PRINT
+    Serial.print("runTimeCounter = "); // TEST_PRINT
+    Serial.println(runTimeCounter); // TEST_PRINT
 
 			 delay(stepDelay); 
 
@@ -526,8 +543,11 @@ void runMotor1Up(byte runTimeCounter) {
 }
 
 
+
+// -----------------------------------------------------------------------------------------------
+
 // this function activates runMotor1Down
-void runMotor1Down(byte runTimeCounter) { 
+void runMotor1Down(byte runTimeCounter) {
 
   // Serial.println("530.00 Dit is de functie void runMotor1Down(DownTimeLimit)"); // TEST_PRINT
   // delay(10000); // TEST_PRINT
@@ -537,8 +557,8 @@ void runMotor1Down(byte runTimeCounter) {
     digitalWrite(motor1UP, LOW);
     digitalWrite(motor1DOWN, HIGH);
 
-  	// Serial.print("runTimeCounter = "); // TEST_PRINT
-    // Serial.println(runTimeCounter); // TEST_PRINT
+  	Serial.print("runTimeCounter = "); // TEST_PRINT
+    Serial.println(runTimeCounter); // TEST_PRINT
 
 		delay(stepDelay); 
 
@@ -563,6 +583,9 @@ void runMotor1Down(byte runTimeCounter) {
 
 }
 
+
+
+// -----------------------------------------------------------------------------------------------
 
 // this function stops motor1
 void runMotor1Stop() {
