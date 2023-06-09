@@ -34,7 +34,7 @@ They are indicated with // ATTENTION-ADJUST in the code:
 
 **summerTimeOffset:**
 The ephemerides in the array are expressed according UTC (Greenwich Meantime)(no Daylight Saving Time).
-Subtract1 hour from the time reading (tm.Hour) in case the DS1307 RTC time was initialized in Daylight Saving Time (Summer Time) 
+Subtract1 hour from the time reading (tm.Hour) in case the DS1307 real-time-clock is running in Daylight Saving Time (Summer Time) 
 
 **sunSetOffset:**
 make sure you leave enough time for the chickens to go to bed
@@ -42,13 +42,13 @@ increase sunSetNow with a safety offset time (e.g. 60 minutes)
 
 **sunRiseOffset:**
 do not wake up the chickens too early
-increase sunRiseNow with a safety offset time (e.g. 30 minutes)
+increase sunRiseNow with a safety offset time (e.g. 10 minutes)
 
 **SWITCH_IS_ACTIVATED /  SWITCH_NOT_ACTIVATED:**
 the HIGH or LOW status depends on the switch type (NORMAL_OPEN or NORMAL_CLOSE) and on the wiring and the configuration of the switch INPUT PINS.
 
 **DownTimeLimit:**
-limit the runtime to avoid keeping the motor running forever when a switch is never activated (e.g. due to a blocked door or a detached rope ...)
+limit the runtime to avoid damage when the motor runs forever when none of the switches can be activated (e.g. due to a blocked door or a detached rope ...)
 runtime depends on the motorspeed, the diameter of the spool and the door elevation height.
 Set a security runtime limit for door closing cycle (appropriated for your situation).
 
@@ -57,9 +57,9 @@ Sometimes an obstruction during the door closing event may may cause some slack 
 Therefore the UptimeLimit should be a little bit higher than the DownTimeLimit.
 
 **pressDownButton:**
-For test purposes you can switch from 'automatic modus' to 'manual modus' by pressing a button.
-In 'manual modus'the door will close when the upperSwitch is activated ( = when the door is open), or the door will open when the upperSwitch is not activated ( = the door is closed or halfway).
-To leave the 'manual modus': press the button while both upperSwitch AND lowerSwitch are simultaneously activated. The program will return to 'automatic modus' 
+For test purposes you can press a button to switch from 'automatic modus' to 'manual modus'.
+In 'manual modus'the motor will start cycling between opening and closing: the door will close when the upperSwitch is activated ( = when the door is open), or the door will open when the upperSwitch is not activated ( = the door is closed or halfway).
+To leave the 'manual modus':activate both the upperSwitch AND the lowerSwitch simultaneously. The program will return to 'automatic modus' 
  
 ### further documentation:
 
