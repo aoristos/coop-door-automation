@@ -1,7 +1,7 @@
 /*
  * Open and close a chicken coop door, using an Arduino Uno, a MotorShield-L298N and a Real Time Clock DS1307RTC
  *
- * Version = 2.1.2
+ * Version = 2.2.0
  *
  * Hardware:
  *  Arduino Uno
@@ -188,7 +188,7 @@ void loop()
   // delay(10000); // TEST_PRINT
 
   // Print the version number
-  // Serial.print("version = 2.1.2"); //TEST_PRINT
+  // Serial.print("version = 2.2.0"); //TEST_PRINT
   // Serial.println(" - summertime"); //TEST_PRINT
  
   tmElements_t tm;
@@ -252,7 +252,7 @@ void loop()
 
     }
 
-	} 
+	}
 
 	else if (RTC.chipPresent()) {
 
@@ -266,7 +266,7 @@ void loop()
       // Serial.println("         example to initialize the time and begin running.");
       // Serial.println();
 
-    } 
+    }
 
 		else {
 			
