@@ -453,23 +453,25 @@ void reset-automatic {
 // this function uses the type 'tmElements_t' object 'tm' from the 'DS1307RTC.h' library
 bool checkNightTime(tmElements_t tm) {
 
-// finetuning sunRiseNow & sunSetNow per day
+// finetuning sunRiseNow & sunSetNow progression/regression per day (assuming a month has 30 days)
+// Calculate the average daily time variation: ((array[thisMonth] minus array[nextMonth]) divided by 30 days)
+// e.g. algorithm for calculating sunRiseNow:
 // int sunRiseNow = sun_rise[thisMonth] - ((sun_rise[thisMonth] - sun_rise[nextMonth]) * Today / 30) + sunRiseOffset;
 // e.g sunRiseNow for 18 januari
 // sunRiseNow = 526 - ((526 - 491) * 18 / 30) + 0
 
   byte Today = tm.Day;
 
+  // ! thisMonth=(tm.Month-1) because the first element of an array is at index 0 (the array positions count from [0] to [11])
   byte thisMonth = (tm.Month - 1);
   byte nextMonth = tm.Month;
   if (thisMonth == 11) {
       nextMonth = 0;
     }
-  // ! thisMonth=(tm.Month-1) because the first element of an array is at index 0 (the array positions count from [0] to [11])
+// Find the appropriate time in the array sun_rise[] and add a safety offset time (e.g. 0 minutes) to avoid a premature wake up.
   int sunRiseNow = sun_rise[thisMonth] - ((sun_rise[thisMonth] - sun_rise[nextMonth]) * Today / 30) + sunRiseOffset;
-  //(old algorithm) int sunRiseNow = sun_rise[(monthNumber -1)] + sunRiseOffset;  // Find the appropriate time in the array sun_rise[] and add a safety offset time (e.g. 30 minutes) to avoid a premature wake up.
+// Find the appropriate time in the array sun_set[] and add a safety offset time (e.g. 60 minutes) to avoid "locked-out" chickens.
   int sunSetNow = sun_set[thisMonth] - ((sun_set[thisMonth] - sun_set[nextMonth]) * Today / 30) + sunSetOffset;
-  //(old algorithm) int sunSetNow = sun_set[(monthNumber -1)] + sunSetOffset;  // Find the appropriate time in the array sun_set[] and add a safety offset time (e.g. 60 minutes) to avoid "locked-out" chickens.
 
   int clockTimeNow = (tm.Hour-summerTimeOffset) * 60 + tm.Minute; // clockTimeNow in minutes: substract 1 Hour (summerTimeOffset=1) when the clock runs in summertime 
 
