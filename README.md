@@ -21,7 +21,8 @@ After our chickens were killed a second time by a fox, I decided to install a di
 
 The main function of this program is to close the chicken coop door at sunset and to open it at sunrise.
 
-The Arduino controller uses a real-time-clock and an array with sunrise/sunset ephemerides to open/close the door at the right time.
+The Arduino controller uses a real-time-clock and an array with sunrise/sunset ephemerides (one value per month) to open/close the door at the right time.
+The sunrise/sunset values per day are extrapollated from the monthly values (supposed 30 days in one month)
 You can use the NOAA_Solar_Calculations_year to calculate the appropriate values for your geographic location ( https://gml.noaa.gov/grad/solcalc/calcdetails.html )
 
 An upperswitch and a lowerswitch are used to limit the course of the door.
