@@ -126,15 +126,15 @@
 // Jan   Feb   Mar   Apr   May   Jun   Jul   Aug   Sep   Oct   Nov   Dec
 // Values based on NOAA_Solar_Calculations_year ( https://gml.noaa.gov/grad/solcalc/calcdetails.html )
 
-  int sun_rise[12]={
-  //Jan   Feb   Mar   Apr   May   Jun   Jul   Aug   Sep   Oct   Nov   Dec
-  526, 491, 436, 368, 310, 277, 286, 325, 372, 419, 470, 515};
-  // 08:46, 08:11, 07:16, 06:08, 05:09, 04:36, 04:45, 05:25, 06:12, 06:58, 07:50, 08:34     - Times are GMT+1 ; no Daylight Saving Time (no summer time)
- 
-  int sun_set[12] ={
-  //Jan   Feb   Mar   Apr   May   Jun   Jul   Aug   Sep   Oct   Nov   Dec
-  1022, 1072, 1120, 1170, 1218, 1256, 1259, 1221, 1158, 1091, 1032, 1004};
-  // 17:01, 17:51, 18:40, 19:30, 20:17, 20:56, 20:59, 20:20, 19:17, 18:11, 17:11, 16:43      - Times are GMT+1 ; no Daylight Saving Time (no summer time)
+ // Sunrise times are GMT+1 ; no Daylight Saving Time (no summer time)
+//Jan 08:48 - Feb 08:22 - Mar 07:31 - Apr 06:23 - May 05:21 - Jun 04:39
+//Jul 04:38 - Aug 05:13 - Sep 06:00 - Oct 06:46 - Nov 07:37 - Dec 08:26
+ int sun_rise[12]={529, 503, 451, 383, 321, 279, 278, 313, 361, 407, 458, 506};
+
+ // sunset times are GMT+1 ; no Daylight Saving Time (no summer time)
+  //Jan 16:51 - Feb 17:37 - Mar 18:27 - Apr 19:18 - May 20:06 - Jun 20:49
+	//Jul 21:03 - Aug 20:32 - Sep 19:33 - Oct 18:26 - Nov 17:22 - Dec 16:45
+  int sun_set[12] ={1012, 1058, 1107, 1158, 1207, 1250, 1263, 1233, 1173, 1106, 1043, 1005};
 
 
 // -----------------------------------------------------------------------------------------------

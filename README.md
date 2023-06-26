@@ -25,17 +25,18 @@ The Arduino controller uses a real-time-clock and an array with sunrise/sunset e
 The sunrise/sunset values per day are extrapollated from the monthly values (supposed 30 days in one month)
 You can use the NOAA_Solar_Calculations_year to calculate the appropriate values for your geographic location ( https://gml.noaa.gov/grad/solcalc/calcdetails.html )
 
-An upperswitch and a lowerswitch are used to limit the course of the door.
+Two switches, an upperswitch and a lowerswitch, are used to limit the course of the door.
 The door can activate either one of the two switches: the UPPERSWITCH is activated when the door is fully open, the LOWERSWITCH is activated when the door is fully closed.
 
-The correct time-of-the-day has to set in the "DS1307 Tiny RTC"  before running this Arduino sketch.
+The correct time-of-the-day has to be initiated in the "DS1307 Tiny RTC" before running this Arduino sketch.
+! The summerTimeOffset should be set to 1 in case the RTC runs in Daylight Saving Time.
 
 Some variables need to be adjusted once before the sketch is uploaded to the Arduino Uno.
 They are indicated with // ATTENTION-ADJUST in the code:
 
 **summerTimeOffset:**
 The ephemerides in the array are expressed according UTC (Greenwich Meantime)(no Daylight Saving Time).
-Subtract1 hour from the time reading (tm.Hour) in case the DS1307 real-time-clock is running in Daylight Saving Time (Summer Time) 
+Subtract 1 hour from the time reading (tm.Hour) in case the DS1307 real-time-clock is running in Daylight Saving Time (Summer Time) 
 
 **sunSetOffset:**
 make sure you leave enough time for the chickens to go to bed
