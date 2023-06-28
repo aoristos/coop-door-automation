@@ -236,7 +236,7 @@ void loop()
 			// Serial.println("02.10.11.11 nightTime has changed !"); // TEST_PRINT
 
 	    // Reset buttonPressedFlag an Alarmflag to return to automatic mode
-      reset-automatic();
+      reset_auto_modus();
 
     }
 
@@ -278,7 +278,7 @@ void loop()
 	  // delay(10000); // TEST_PRINT
 
 	  // Reset buttonPressedFlag an Alarmflag to return to automatic mode
-    reset-automatic();
+    reset_auto_modus();
 
 	}
 
@@ -420,7 +420,7 @@ void loop()
 
 // -----------------------------------------------------------------------------------------------
 
-void reset-automatic {
+void reset_auto_modus() {
 
 	// Reset buttonPressedFlag an Alarmflag to return to automatic mode
 
