@@ -6,7 +6,7 @@ token
 *.mm
 *.png
 *.bak
-*.drawio*
+*.bkp
 *.vy*
 *.lock
 *.minder
