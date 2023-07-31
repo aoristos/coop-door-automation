@@ -1,4 +1,4 @@
-<mxfile host="Electron" modified="2023-07-06T07:40:36.538Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.4.0 Chrome/112.0.5615.204 Electron/24.5.1 Safari/537.36" etag="kNQYtbHxvVozh9TkCcTE" version="21.4.0" type="device" pages="7">
+<mxfile host="Electron" modified="2023-07-30T07:36:10.611Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.6.5 Chrome/114.0.5735.243 Electron/25.3.1 Safari/537.36" etag="wyReMyq15u0ui_iEEcpy" version="21.6.5" type="device" pages="7">
   <diagram id="2nEA5foDq7UR0FHGf2Sk" name="basis-logica">
     <mxGraphModel dx="954" dy="658" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
@@ -651,7 +651,7 @@
           <mxGeometry x="650" y="193" width="122" height="70" as="geometry" />
         </mxCell>
         <mxCell id="pjpkOB-BmHNHuexBAfnp-4" value="functies" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.terminator;whiteSpace=wrap;fillColor=#ffff88;strokeColor=#36393d;" parent="1" vertex="1">
-          <mxGeometry x="655" y="512" width="100" height="40" as="geometry" />
+          <mxGeometry x="655" y="538" width="100" height="40" as="geometry" />
         </mxCell>
         <mxCell id="_cghj8GU8sdm1wNfOWeA-1" value="checkNightTime(tm)" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;strokeWidth=2;" parent="1" vertex="1">
           <mxGeometry x="620" y="681.38" width="170" height="37.25" as="geometry" />
@@ -735,7 +735,7 @@
           <mxGeometry x="287" y="533.5" width="40" height="20" as="geometry" />
         </mxCell>
         <mxCell id="I_xDgIHEbyUg3HK4onE5-25" value="GLOBAL&lt;br&gt;Pin configuration" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.terminator;whiteSpace=wrap;fillColor=#ffff88;strokeColor=#36393d;" parent="1" vertex="1">
-          <mxGeometry x="400" y="9" width="120" height="40" as="geometry" />
+          <mxGeometry x="360" y="9" width="120" height="40" as="geometry" />
         </mxCell>
         <mxCell id="I_xDgIHEbyUg3HK4onE5-26" value="GLOBAL variabelen" style="swimlane;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="20" y="64" width="204" height="730" as="geometry" />
